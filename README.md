@@ -79,6 +79,6 @@ La documentación completa del proyecto se encuentra en Google Drive del equipo,
 
 
 
-Período de desarrollo: 04 de mayo – 05 de junio de 2026
-Integrantes   @cmarta22  @matiasespindola88  @nadpess  @fedesolis8  
+Período de desarrollo: 04 de mayo – 05 de junio de 2026  
+Integrantes   @ cmarta22  @ matiasespindola88  @ nadpess  @ fedesolis8  
 
