@@ -44,6 +44,8 @@ Desarrollar un Asistente de IA que integre LLM y RAG para optimizar la atención
 | **Solis, Federico** | Comunicador del Equipo | Arquitecto de Solución | Integrador de Sistemas |
 
 
+
+
 🗓️ Cronograma General
 | Sprint | Período | Foco |
 | :--- | :--- | :--- |
@@ -71,13 +73,15 @@ Desarrollar un Asistente de IA que integre LLM y RAG para optimizar la atención
 └── README.md
 
 
+
 📄 Documentación
+
 La documentación completa del proyecto se encuentra en Google Drive del equipo, incluyendo:
 
-Ámbito de desarrollo
-Diagrama de Gantt
-Actas de reunión
-Retrospectivas de cada Sprint
+  - Ámbito de desarrollo
+  - Diagrama de Gantt
+  - Actas de reunión
+  - Retrospectivas de cada Sprint
 
 
 
