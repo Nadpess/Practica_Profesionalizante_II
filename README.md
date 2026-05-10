@@ -22,7 +22,9 @@ Desarrollar un Asistente de IA que integre LLM y RAG para optimizar la atención
 
 
 🛠️ Stack Tecnológico
+
 | Tecnología | Uso |
+| :--- | :---: |
 | Python + Flask| Backend modular y gestión de la API | 
 | LLM (Large Language Models) | Procesamiento de lenguaje natural | 
 | RAG (Retrieval-Augmented Generation) | Recuperación de información desde la base de conocimientos | 
