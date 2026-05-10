@@ -18,7 +18,7 @@ Bigtools · Sector de comercio de máquinas viales e industriales, herramientas 
 🎯 **Objetivo General**
 Desarrollar un Asistente de IA que integre LLM y RAG para optimizar la atención al cliente, el soporte técnico de posventa y la expansión hacia nuevos segmentos comerciales, procesando documentación técnica, manuales de servicio y catálogos de maquinaria de gran porte.  
 
-🛠️ **Stack Tecnológico**  
+## 🛠️ **Stack Tecnológico**  
 | Tecnología | Uso |
 | :--- | :---: |
 | Python + Flask| Backend modular y gestión de la API | 
@@ -31,7 +31,7 @@ Desarrollar un Asistente de IA que integre LLM y RAG para optimizar la atención
 
   
 
-👥 **Equipo**  
+## 👥 **Equipo**  
 
 | Integrante | Sprint 1 | Sprint 2 | Sprint 3 |
 | :--- | :--- | :--- | :--- |
@@ -41,7 +41,7 @@ Desarrollar un Asistente de IA que integre LLM y RAG para optimizar la atención
 | **Solis, Federico** | Comunicador del Equipo | Arquitecto de Solución | Integrador de Sistemas |
 
   
-🗓️ **Cronograma General**
+## 🗓️ **Cronograma General**
 | Sprint | Período | Foco |
 | :--- | :--- | :--- |
 | **Sprint 1** | 04/05/2026 – 10/05/2026 | Planificación, análisis inicial y definición del proyecto |
@@ -50,7 +50,7 @@ Desarrollar un Asistente de IA que integre LLM y RAG para optimizar la atención
 
   
 
-📁 **Estructura del Repositorio**  
+## 📁 **Estructura del Repositorio**  
 
 ├── docs/               # Documentación del proyecto (ámbito de desarrollo, retrospectivas, etc.)
 
@@ -68,7 +68,7 @@ Desarrollar un Asistente de IA que integre LLM y RAG para optimizar la atención
 
 
   
-📄 **Documentación**  
+## 📄 **Documentación**  
 
 La documentación completa del proyecto se encuentra en Google Drive del equipo, incluyendo:
 
@@ -80,4 +80,5 @@ La documentación completa del proyecto se encuentra en Google Drive del equipo,
 
 
 Período de desarrollo: 04 de mayo – 05 de junio de 2026
+Integrantes   @cmarta22  @matiasespindola88  @nadpess  @fedesolis8  
 
