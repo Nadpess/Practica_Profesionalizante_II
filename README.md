@@ -10,15 +10,13 @@ Centro Politécnico Superior Malvinas Argentinas · 2° Año · 2° Cuatrimestre
 📌 **Descripción del Proyecto**
 Desarrollo de un Asistente de Inteligencia Artificial avanzado basado en Large Language Models (LLM) y arquitectura RAG (Retrieval-Augmented Generation), orientado a potenciar la expansión comercial de Bigtools hacia nuevos segmentos de mercado.
 
-El sistema permite al equipo comercial y a los clientes de Big Tools realizar consultas en lenguaje natural sobre especificaciones técnicas, manuales de maquinaria y catálogos de productos, obteniendo respuestas precisas basadas exclusivamente en la base de conocimientos oficial de la empresa, minimizando alucinaciones de la IA.
-\
+El sistema permite al equipo comercial y a los clientes de Big Tools realizar consultas en lenguaje natural sobre especificaciones técnicas, manuales de maquinaria y catálogos de productos, obteniendo respuestas precisas basadas exclusivamente en la base de conocimientos oficial de la empresa, minimizando alucinaciones de la IA.  
+
 🏢 **Organización Coformadora**
-Bigtools · Sector de comercio de máquinas viales e industriales, herramientas y servicios de mantenimiento y obra civil.
-\
+Bigtools · Sector de comercio de máquinas viales e industriales, herramientas y servicios de mantenimiento y obra civil.  
 
 🎯 **Objetivo General**
-Desarrollar un Asistente de IA que integre LLM y RAG para optimizar la atención al cliente, el soporte técnico de posventa y la expansión hacia nuevos segmentos comerciales, procesando documentación técnica, manuales de servicio y catálogos de maquinaria de gran porte.
-\
+Desarrollar un Asistente de IA que integre LLM y RAG para optimizar la atención al cliente, el soporte técnico de posventa y la expansión hacia nuevos segmentos comerciales, procesando documentación técnica, manuales de servicio y catálogos de maquinaria de gran porte.  
 
 🛠️ **Stack Tecnológico**\
 | Tecnología | Uso |
