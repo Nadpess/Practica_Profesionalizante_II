@@ -1,11 +1,10 @@
 # Practica_Profesionalizante_II
 Este repositorio contiene el desarrollo de un sistema RAG propuesto como proyecto de la Práctica Profesionalizante II de la Tec. en Ciencia de datos e Inteligencia Artificial.
 
+
 🤖 Asistente IA – Big Tools
 Práctica Profesionalizante II · Tecnicatura Superior en Ciencia de Datos e Inteligencia Artificial
 Centro Politécnico Superior Malvinas Argentinas · 2° Año · 2° Cuatrimestre · 2026
-
-
 
 📌 Descripción del Proyecto 
 Desarrollo de un Asistente de Inteligencia Artificial avanzado basado en Large Language Models (LLM) y arquitectura RAG (Retrieval-Augmented Generation), orientado a potenciar la expansión comercial de Bigtools hacia nuevos segmentos de mercado.
@@ -36,48 +35,21 @@ Desarrollar un Asistente de IA que integre LLM y RAG para optimizar la atención
 
 
 👥 Equipo
-Integrante
-Sprint 1
-Sprint 2
-Sprint 3
-Cruz, Marta
-Coordinadora de Recursos
-Especialista Técnica en IA
-Diseñadora de Visualización y Resultados
-Espíndola, Matías
-Especialista Técnico en IA
-Responsable Ético y Legal
-Evaluador de Modelos
-Pessina, Nadia
-Coordinadora de Recursos
-Analista de Datos y Features
-Comunicadora del Equipo
-Solis, Federico
-Comunicador del Equipo
-Arquitecto de Solución
-Integrador de Sistemas
 
+| Integrante | Sprint 1 | Sprint 2 | Sprint 3 |
+| :--- | :--- | :--- | :--- |
+| **Cruz, Marta** | Coordinadora de Recursos | Especialista Técnica en IA | Diseñadora de Visualización y Resultados |
+| **Espíndola, Matías** | Especialista Técnico en IA | Responsable Ético y Legal | Evaluador de Modelos |
+| **Pessina, Nadia** | Coordinadora de Recursos | Analista de Datos y Features | Comunicadora del Equipo |
+| **Solis, Federico** | Comunicador del Equipo | Arquitecto de Solución | Integrador de Sistemas |
 
 
 🗓️ Cronograma General
-Sprint
-Período
-Foco
-Sprint 1
-04/05/2026 – 10/05/2026
-Planificación, análisis inicial y definición del proyecto
-Sprint 2
-11/05/2026 – 25/05/2026
-Diseño y desarrollo del sistema
-Sprint 3
-26/05/2026 – 05/06/2026
-Despliegue, validación y presentación final
-
-
-
-
-
-
+| Sprint | Período | Foco |
+| :--- | :--- | :--- |
+| **Sprint 1** | 04/05/2026 – 10/05/2026 | Planificación, análisis inicial y definición del proyecto |
+| **Sprint 2** | 11/05/2026 – 25/05/2026 | Diseño y desarrollo del sistema |
+| **Sprint 3** | 26/05/2026 – 05/06/2026 | Despliegue, validación y presentación final |
 
 
 
