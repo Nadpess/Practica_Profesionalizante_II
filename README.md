@@ -18,7 +18,7 @@ Bigtools · Sector de comercio de máquinas viales e industriales, herramientas 
 🎯 **Objetivo General**
 Desarrollar un Asistente de IA que integre LLM y RAG para optimizar la atención al cliente, el soporte técnico de posventa y la expansión hacia nuevos segmentos comerciales, procesando documentación técnica, manuales de servicio y catálogos de maquinaria de gran porte.  
 
-🛠️ **Stack Tecnológico**\
+🛠️ **Stack Tecnológico**  
 | Tecnología | Uso |
 | :--- | :---: |
 | Python + Flask| Backend modular y gestión de la API | 
@@ -29,9 +29,9 @@ Desarrollar un Asistente de IA que integre LLM y RAG para optimizar la atención
 | Google Drive | Almacenamiento de documentación y archivos | 
 | Trello | Gestión y seguimiento de tareas | 
 
-\
+  
 
-👥 **Equipo**\
+👥 **Equipo**  
 
 | Integrante | Sprint 1 | Sprint 2 | Sprint 3 |
 | :--- | :--- | :--- | :--- |
@@ -40,9 +40,7 @@ Desarrollar un Asistente de IA que integre LLM y RAG para optimizar la atención
 | **Pessina, Nadia** | Coordinadora de Recursos | Analista de Datos y Features | Comunicadora del Equipo |
 | **Solis, Federico** | Comunicador del Equipo | Arquitecto de Solución | Integrador de Sistemas |
 
-
-\
-
+  
 🗓️ **Cronograma General**
 | Sprint | Período | Foco |
 | :--- | :--- | :--- |
@@ -50,9 +48,9 @@ Desarrollar un Asistente de IA que integre LLM y RAG para optimizar la atención
 | **Sprint 2** | 11/05/2026 – 25/05/2026 | Diseño y desarrollo del sistema |
 | **Sprint 3** | 26/05/2026 – 05/06/2026 | Despliegue, validación y presentación final |
 
+  
 
-
-📁 **Estructura del Repositorio**\
+📁 **Estructura del Repositorio**  
 
 ├── docs/               # Documentación del proyecto (ámbito de desarrollo, retrospectivas, etc.)
 
@@ -69,8 +67,8 @@ Desarrollar un Asistente de IA que integre LLM y RAG para optimizar la atención
 └── README.md
 
 
-
-📄 **Documentación**\
+  
+📄 **Documentación**  
 
 La documentación completa del proyecto se encuentra en Google Drive del equipo, incluyendo:
 
