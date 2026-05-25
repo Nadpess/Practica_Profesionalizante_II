@@ -1,4 +1,4 @@
-# 🔧 Big Tools — Sistema Experto de Diagnóstico de Máquinas
+<!--  # 🔧 Big Tools — Sistema Experto de Diagnóstico de Máquinas
 
 <div align="center">
 
@@ -783,7 +783,7 @@ Ver `requirements.txt` para versiones exactas.
 
 ### Verificación Rápida
 
-```powershell
+```powershell -->
 # Verificar que todo funciona:
 curl -s "http://127.0.0.1:8000/api/maquinas"
 
