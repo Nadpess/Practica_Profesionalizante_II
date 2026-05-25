@@ -1,0 +1,33 @@
+site_name: "Big Tools - Sistema Experto de Diagnóstico"
+site_url: https://github.com/Axumis/Big-Tools
+repo_url: https://github.com/Axumis/Big-Tools
+repo_name: BigTools
+theme:
+  name: material
+  language: es
+  logo: assets/logo.png
+  favicon: assets/logo.ico
+  features:
+    - navigation.footer
+  palette:
+    # Modo Claro
+    - scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Modo claro
+      primary: red
+      accent: pink
+
+    # Modo Oscuro
+    - scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Modo oscuro
+      primary: red
+      accent: pink
+      
+nav:
+  - Inicio: index.md
+  - Informe Sitema Experto: INFORME_SISTEMA_EXPERTO.md
+
+copyright: Copyright &copy; 2025 Tecnicatura Superior en Ciencia de Datos e Inteligencia Artificial - Politécnico Malvinas Argentinas

@@ -1,0 +1,366 @@
+# Backend/api/rag/retriever.py
+
+import re
+import ollama
+import json
+from pathlib import Path
+
+from . import normalizar_nombre_coleccion, get_cliente_chroma, detectar_idioma
+from .cache import buscar_en_cache, guardar_en_cache
+
+N_RESULTADOS       = 6
+N_RESULTADOS_FINAL = 8
+
+
+# ── Traducción de chunks en inglés ────────────────────────────────────────────
+
+def _traducir_chunks_al_espanol(chunks: list) -> list:
+    en_idx = [i for i, c in enumerate(chunks)
+              if (c.get("_idioma_resuelto") or detectar_idioma(c.get("texto", ""))) == "en"]
+    if not en_idx:
+        return chunks
+    fragmentos = "\n\n".join(
+        f"[{n+1}] {chunks[i]['texto'][:500]}"
+        for n, i in enumerate(en_idx)
+    )
+    prompt = (
+        "Translate each numbered excerpt to Spanish. "
+        "Keep numbers, units, model names and part codes unchanged. "
+        "Reply ONLY with the translations in the same numbered format:\n\n"
+        + fragmentos
+    )
+    try:
+        resp = ollama.generate(
+            model="llama3.2:3b",
+            prompt=prompt,
+            stream=False,
+            options={
+                "num_predict": 150 * len(en_idx),
+                "temperature": 0,
+                "num_ctx":     min(4096, 800 * len(en_idx)),
+            },
+        )
+        texto_resp = resp.get("response", "").strip()
+        resultado  = list(chunks)
+        partes     = re.split(r"\[\d+\]", texto_resp)
+        partes     = [p.strip() for p in partes if p.strip()]
+        for n, traduccion in enumerate(partes):
+            if n < len(en_idx):
+                resultado[en_idx[n]] = {**chunks[en_idx[n]], "texto": traduccion}
+        return resultado
+    except Exception:
+        return chunks
+
+
+# ── Query expansion (desactivada) ─────────────────────────────────────────────
+
+def _expandir_query(pregunta: str) -> list[str]:
+    return [pregunta]
+
+
+# ── Embedding ─────────────────────────────────────────────────────────────────
+
+def _embedding(texto: str) -> list:
+    try:
+        return ollama.embeddings(model="nomic-embed-text", prompt=texto)["embedding"]
+    except Exception as e:
+        raise ConnectionError(f"No se pudo conectar con Ollama: {e}")
+
+
+# ── Helpers de idioma ─────────────────────────────────────────────────────────
+
+def _resolver_idioma(chunk: dict) -> str:
+    idioma = chunk.get("idioma", "")
+    if idioma in ("es", "en", "und"):
+        return idioma
+    return detectar_idioma(chunk.get("texto", ""))
+
+
+def _preferir_espanol(chunks: list[dict]) -> list[dict]:
+    for c in chunks:
+        c["_idioma_resuelto"] = _resolver_idioma(c)
+
+    es_chunks  = [c for c in chunks if c["_idioma_resuelto"] == "es"]
+    en_chunks  = [c for c in chunks if c["_idioma_resuelto"] == "en"]
+    und_chunks = [c for c in chunks if c["_idioma_resuelto"] == "und"]
+
+    if len(es_chunks) >= 3:
+        preferidos = es_chunks + und_chunks
+        if len(preferidos) < N_RESULTADOS_FINAL:
+            preferidos += en_chunks[:N_RESULTADOS_FINAL - len(preferidos)]
+        return preferidos[:N_RESULTADOS_FINAL]
+
+    return chunks
+
+
+# ── Búsqueda híbrida ──────────────────────────────────────────────────────────
+
+def buscar_chunks(nombre_maquina: str, pregunta: str) -> list[dict]:
+    """
+    Búsqueda híbrida: semántica primero, keyword fallback si los scores son débiles.
+    El keyword fallback usa la frase completa (no palabras sueltas) para evitar
+    falsos positivos. Ej: "el compresor no arranca" → busca "EL COMPRESOR NO ARRANCA"
+    en el texto indexado, encontrando filas de tablas de síntomas/averías.
+    """
+    cliente = get_cliente_chroma()
+
+    try:
+        coleccion = cliente.get_collection(name=normalizar_nombre_coleccion(nombre_maquina))
+    except Exception:
+        return []
+
+    queries = _expandir_query(pregunta)
+    n       = min(N_RESULTADOS, coleccion.count())
+    vistos  = {}
+
+    # ── 1. Búsqueda semántica ──────────────────────────────────────────────────
+    for query in queries:
+        emb = _embedding(query)
+        try:
+            resultados = coleccion.query(query_embeddings=[emb], n_results=n)
+        except Exception:
+            return []
+        for i, doc in enumerate(resultados["documents"][0]):
+            score  = resultados["distances"][0][i]
+            meta   = resultados["metadatas"][0][i]
+            if doc not in vistos or score < vistos[doc]["score"]:
+                vistos[doc] = {
+                    "texto":   doc,
+                    "pagina":  meta["pagina"],
+                    "seccion": meta.get("seccion", ""),
+                    "idioma":  meta.get("idioma", ""),
+                    "score":   score,
+                }
+
+    # ── 2. Keyword fallback — frase completa, solo si la semántica es débil ────
+    mejor_score_semantico = min((v["score"] for v in vistos.values()), default=1.0)
+    if mejor_score_semantico > 0.35:
+        for variante in [pregunta, pregunta.upper(), pregunta.lower()]:
+            try:
+                kw = coleccion.get(
+                    where_document={"$contains": variante},
+                    include=["documents", "metadatas"],
+                    limit=4,
+                )
+                for doc, meta in zip(kw.get("documents", []), kw.get("metadatas", [])):
+                    if doc not in vistos:
+                        vistos[doc] = {
+                            "texto":   doc,
+                            "pagina":  meta["pagina"],
+                            "seccion": meta.get("seccion", ""),
+                            "idioma":  meta.get("idioma", ""),
+                            "score":   0.28,
+                        }
+            except Exception:
+                pass
+
+    chunks_ordenados = sorted(vistos.values(), key=lambda c: c["score"])
+    return _preferir_espanol(chunks_ordenados[:N_RESULTADOS_FINAL * 2])[:N_RESULTADOS_FINAL]
+
+
+def calcular_confianza(chunks: list[dict]) -> int:
+    if not chunks:
+        return 0
+    mejores  = sorted(chunks, key=lambda c: c["score"])[:3]
+    promedio = sum(c["score"] for c in mejores) / len(mejores)
+    MAX_DIST = 400
+    confianza = max(0, round((1 - promedio / MAX_DIST) * 100))
+    if len(chunks) < 3:
+        confianza = round(confianza * 0.8)
+    return min(confianza, 100)
+
+
+# ── Construcción de prompts ───────────────────────────────────────────────────
+
+def _construir_prompt(
+    nombre_maquina: str,
+    pregunta: str,
+    chunks: list,
+    modo_analisis: bool = False,
+    historial: list = None,
+) -> str:
+    def _fmt(c: dict) -> str:
+        header = f"[Pág. {c['pagina']}]"
+        if c.get("seccion"):
+            header += f" {c['seccion']} —"
+        return f"{header} {c['texto']}"
+
+    contexto    = "\n\n".join(_fmt(c) for c in chunks)
+    archivo_pdf = nombre_maquina.replace(" ", "_") + ".pdf"
+
+    hist_bloque = ""
+    if historial:
+        lineas = []
+        for msg in historial:
+            rol = "Técnico" if msg["role"] == "user" else "Asistente"
+            lineas.append(f"{rol}: {msg['content']}")
+        if lineas:
+            hist_bloque = "CONVERSACIÓN PREVIA:\n" + "\n".join(lineas) + "\n\n"
+
+    if modo_analisis:
+        return (
+            f"Sos el asistente técnico del Sistema Big Tools.\n"
+            f"Analizá la falla usando ÚNICAMENTE los fragmentos del manual proporcionados.\n"
+            f"Tu respuesta debe estar 100% en español. Si el manual está en inglés, TRADUCÍ cada parte.\n"
+            f"El que consulta ES el técnico en campo — nunca lo remitás a 'un técnico'.\n"
+            f"NUNCA inventes datos que no estén en los fragmentos.\n"
+            f"Si la info no está en el manual: escribí exactamente 'Esta información no se encuentra en el manual indexado. Consultá al administrador para actualizar la base de datos.'\n\n"
+            f"FORMATO OBLIGATORIO:\n"
+            f"GRAVEDAD: [🔴 CRÍTICO / 🟡 MODERADO / 🟢 MENOR] — [motivo]\n\n"
+            f"CAUSA PROBABLE:\n[causa raíz según el manual]\n\n"
+            f"RIESGO OPERACIONAL:\n[riesgo de continuar operando sin intervenir]\n\n"
+            f"PROCEDIMIENTO:\n1. [paso ejecutable]\n2. [paso ejecutable]\n...\n\n"
+            f"REFERENCIA: {archivo_pdf}, Pág. [N]\n\n"
+            f"---\n"
+            f"{hist_bloque}"
+            f"FRAGMENTOS DEL MANUAL ({nombre_maquina}):\n{contexto}\n\n"
+            f"FALLA: {pregunta}\n\n"
+            f"ANÁLISIS:"
+        )
+
+    return (
+        f"Sos el asistente técnico del Sistema Big Tools.\n"
+        f"Analizá la consulta y respondé usando ÚNICAMENTE los fragmentos del manual proporcionados.\n\n"
+        f"REGLAS:\n"
+        f"- Tu respuesta debe estar 100% en español. Cero palabras en inglés.\n"
+        f"- Si el manual está en inglés, TRADUCÍ cada paso antes de escribirlo.\n"
+        f"  Ejemplo: 'Press and hold the START button' → 'Mantené presionado el botón de arranque'\n"
+        f"- Sin saludos. Directo al diagnóstico.\n"
+        f"- No hagas preguntas de seguimiento. Con la info disponible, diagnosticá.\n"
+        f"- El que consulta ES el técnico en campo — nunca lo remitás a 'un técnico' ni al 'servicio técnico'.\n"
+        f"- NUNCA inventes pasos, valores ni procedimientos que no estén en los fragmentos.\n"
+        f"- Si la solución está en el manual → respondé con el formato de abajo.\n"
+        f"- Si no está → escribí exactamente: 'Esta información no se encuentra en el manual indexado. Consultá al administrador para actualizar la base de datos.'\n\n"
+        f"FORMATO:\n"
+        f"Causa: [causa según el manual]\n"
+        f"Procedimiento:\n"
+        f"1. [paso concreto y ejecutable]\n"
+        f"2. [paso concreto y ejecutable]\n"
+        f"...\n"
+        f"Referencia: {archivo_pdf}, Pág. [N]\n\n"
+        f"{hist_bloque}"
+        f"FRAGMENTOS DEL MANUAL ({nombre_maquina}):\n{contexto}\n\n"
+        f"CONSULTA: {pregunta}\n\n"
+        f"DIAGNÓSTICO:"
+    )
+
+
+# ── Respuesta completa (sin streaming) ───────────────────────────────────────
+
+def generar_respuesta(nombre_maquina: str, pregunta: str, modo_analisis: bool = False) -> dict:
+    chunks = buscar_chunks(nombre_maquina, pregunta)
+    if not chunks:
+        return {
+            "respuesta": "No encontré información indexada para esta máquina. "
+                         "Asegurate de que el manual esté indexado.",
+            "paginas": [],
+        }
+    paginas = sorted({c["pagina"] for c in chunks})
+    prompt  = _construir_prompt(nombre_maquina, pregunta, chunks, modo_analisis)
+    try:
+        respuesta = ollama.chat(
+            model="llama3.2:3b",
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return {"respuesta": respuesta["message"]["content"], "paginas": paginas}
+    except Exception as e:
+        raise ConnectionError(f"No se pudo conectar con Ollama: {e}")
+
+
+# ── Respuesta con streaming (SSE) ─────────────────────────────────────────────
+
+def generar_respuesta_stream(nombre_maquina: str, pregunta: str, modo_analisis: bool = False):
+    chunks    = buscar_chunks(nombre_maquina, pregunta)
+    paginas   = sorted({c["pagina"] for c in chunks})
+    confianza = calcular_confianza(chunks)
+    secciones = list(dict.fromkeys(c["seccion"] for c in chunks if c.get("seccion")))
+
+    yield f"data: {json.dumps({'tipo': 'meta', 'paginas': paginas, 'confianza': confianza, 'secciones': secciones})}\n\n"
+
+    if not chunks:
+        yield f"data: {json.dumps({'tipo': 'token', 'texto': 'No encontré información relevante en el manual para esta consulta.'})}\n\n"
+        yield f"data: {json.dumps({'tipo': 'fin'})}\n\n"
+        return
+
+    prompt = _construir_prompt(nombre_maquina, pregunta, chunks, modo_analisis)
+    yield f"data: {json.dumps({'tipo': 'inicio_stream'})}\n\n"
+
+    try:
+        for chunk in ollama.generate(
+            model="llama3.2:3b",
+            prompt=prompt,
+            stream=True,
+            options={"num_predict": 400, "temperature": 0.1, "num_ctx": 2048}
+        ):
+            token = chunk.get("response", "")
+            if token:
+                yield f"data: {json.dumps({'tipo': 'token', 'texto': token})}\n\n"
+    except Exception as e:
+        yield f"data: {json.dumps({'tipo': 'error', 'mensaje': str(e)})}\n\n"
+
+    yield f"data: {json.dumps({'tipo': 'fin'})}\n\n"
+
+
+# ── Stream conversacional (con memoria de sesión) ─────────────────────────────
+
+def generar_respuesta_stream_conversacional(
+    nombre_maquina: str,
+    pregunta: str,
+    historial: list,
+):
+    # ── 1. Cache semántico ────────────────────────────────────────────────────
+    es_primera_consulta = not any(m["role"] == "user" for m in historial)
+    if es_primera_consulta:
+        hit = buscar_en_cache(nombre_maquina, pregunta)
+        if hit:
+            yield f"data: {json.dumps({'tipo': 'meta', 'paginas': hit['paginas'], 'confianza': hit['confianza'], 'secciones': hit['secciones'], 'desde_cache': True})}\n\n"
+            yield f"data: {json.dumps({'tipo': 'inicio_stream'})}\n\n"
+            for palabra in hit["respuesta"].split(" "):
+                yield f"data: {json.dumps({'tipo': 'token', 'texto': palabra + ' '})}\n\n"
+            yield f"data: {json.dumps({'tipo': 'respuesta_completa', 'texto': hit['respuesta']})}\n\n"
+            yield f"data: {json.dumps({'tipo': 'fin'})}\n\n"
+            return
+
+    # ── 2. RAG normal ─────────────────────────────────────────────────────────
+    chunks    = buscar_chunks(nombre_maquina, pregunta)
+    paginas   = sorted({c["pagina"] for c in chunks})
+    confianza = calcular_confianza(chunks)
+    secciones = list(dict.fromkeys(c["seccion"] for c in chunks if c.get("seccion")))
+
+    yield f"data: {json.dumps({'tipo': 'meta', 'paginas': paginas, 'confianza': confianza, 'secciones': secciones})}\n\n"
+
+    if not chunks:
+        yield f"data: {json.dumps({'tipo': 'token', 'texto': 'No encontré información relevante en el manual para esta consulta.'})}\n\n"
+        yield f"data: {json.dumps({'tipo': 'fin'})}\n\n"
+        return
+
+    prompt = _construir_prompt(nombre_maquina, pregunta, chunks, False, historial)
+    yield f"data: {json.dumps({'tipo': 'inicio_stream'})}\n\n"
+
+    respuesta_completa = []
+    try:
+        for chunk in ollama.generate(
+            model="llama3.2:3b",
+            prompt=prompt,
+            stream=True,
+            options={"num_predict": 400, "temperature": 0.1, "num_ctx": 2048}
+        ):
+            token = chunk.get("response", "")
+            if token:
+                respuesta_completa.append(token)
+                yield f"data: {json.dumps({'tipo': 'token', 'texto': token})}\n\n"
+    except Exception as e:
+        yield f"data: {json.dumps({'tipo': 'error', 'mensaje': str(e)})}\n\n"
+        yield f"data: {json.dumps({'tipo': 'fin'})}\n\n"
+        return
+
+    texto_final = "".join(respuesta_completa)
+    yield f"data: {json.dumps({'tipo': 'respuesta_completa', 'texto': texto_final})}\n\n"
+    yield f"data: {json.dumps({'tipo': 'fin'})}\n\n"
+
+    # ── 3. Guardar en cache ───────────────────────────────────────────────────
+    if es_primera_consulta and confianza >= 50 and texto_final:
+        try:
+            guardar_en_cache(nombre_maquina, pregunta, texto_final, paginas, confianza, secciones)
+        except Exception:
+            pass

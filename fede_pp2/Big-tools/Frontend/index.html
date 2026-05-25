@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Big Tools - Asistente</title>
+  <link rel="icon" href="/static/assets/img/logo_bigtools.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/playfair-display@5/700.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+  <!-- Canvas de partículas (fondo) -->
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- ══ LOGIN SPLIT SCREEN ══════════════════════════════════════════════════ -->
+  <div id="login-modal" class="login-split">
+
+    <!-- Panel izquierdo: branding -->
+    <div class="login-brand">
+      <div class="brand-ring brand-ring-lg"></div>
+      <div class="brand-ring brand-ring-md"></div>
+      <div class="brand-ring brand-ring-sm"></div>
+      <div class="brand-content">
+        <img src="/static/assets/img/logo_bigtools.svg" alt="Big Tools" class="brand-logo">
+        <div class="brand-divider"></div>
+        <p class="brand-tagline">Sistema Experto<br>de Diagnóstico</p>
+      </div>
+    </div>
+
+    <!-- Panel derecho: formulario -->
+    <div class="login-form-panel">
+      <div class="login-form-inner">
+        <h2 class="login-welcome">Bienvenido</h2>
+        <p class="login-subtitle">Ingresá tus credenciales para acceder al sistema</p>
+        <form id="login-form">
+          <div class="input-group">
+            <input type="text" id="username" placeholder="Usuario" required autocomplete="username">
+            <span class="input-highlight"></span>
+          </div>
+          <div class="input-group">
+            <input type="password" id="password" placeholder="Contraseña" required autocomplete="current-password">
+            <span class="input-highlight"></span>
+          </div>
+          <button type="submit" class="login-btn">
+            <span>Ingresar</span>
+            <div class="btn-shine"></div>
+          </button>
+        </form>
+        <p id="login-error" class="error-msg"></p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ ORBIT SCREEN (selector de máquina) ══════════════════════════════════ -->
+  <div id="orbit-screen" style="display:none;">
+
+    <header class="orbit-header">
+      <div class="orbit-header-left">
+        <img src="/static/assets/img/logo_bigtools.svg" alt="Big Tools" class="orbit-logo">
+      </div>
+      <div class="orbit-header-right">
+        <span id="orbit-user-display" class="orbit-user-chip"></span>
+        <button id="orbit-admin-btn" class="orbit-hbtn" style="display:none"
+          onclick="window.location.href='/admin'">Admin</button>
+        <button id="orbit-logout-btn" class="orbit-hbtn orbit-hbtn-logout">Salir</button>
+      </div>
+    </header>
+
+    <div class="orbit-body">
+
+      <!-- Estado 1: selector de máquina -->
+      <div id="orbit-sel" class="orbit-panel">
+        <span class="orbit-eyebrow">Seleccioná una máquina</span>
+        <div class="orbit-wrap" id="orbit-wrap">
+          <div class="orbit-spin" id="orbit-spin"></div>
+          <div class="orbit-hub">BIG<br>TOOLS</div>
+        </div>
+        <button class="orbit-more-btn" id="orbit-more-btn">+ Ver todos los manuales</button>
+      </div>
+
+      <!-- Estado 2: selector de modo -->
+      <div id="orbit-mode" class="orbit-panel" style="display:none;">
+        <div class="mode-topbar">
+          <div class="mode-machine-pill">
+            <div class="pill-online-dot"></div>
+            <span class="mode-machine-name" id="orbit-machine-name"></span>
+            <span class="mode-machine-badge">indexado</span>
+          </div>
+          <div class="mode-topbar-actions">
+            <button class="mode-topbar-btn" onclick="orbitGoBack()">← Cambiar</button>
+            <button class="mode-topbar-btn" onclick="orbitReiniciar()">Reiniciar</button>
+          </div>
+        </div>
+
+        <div class="mode-cards-grid">
+          <div class="mode-card-item" id="btn-se-mode">
+            <div class="mode-card-accent red"></div>
+            <div class="mode-card-title">Diagnóstico guiado</div>
+            <div class="mode-card-desc">Sistema experto con árbol de decisión paso a paso</div>
+          </div>
+          <div class="mode-card-item" id="btn-rag-mode">
+            <div class="mode-card-accent blue"></div>
+            <div class="mode-card-title">Consulta libre</div>
+            <div class="mode-card-desc">Preguntale directamente al manual de la máquina</div>
+          </div>
+        </div>
+
+        <div class="mode-back-link" onclick="orbitGoBack()">← Volver a todas las máquinas</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ CHAT SCREEN ══════════════════════════════════════════════════════════ -->
+  <div id="main-container" class="container" style="display:none;">
+    <header class="header">
+      <div class="header-left">
+        <img src="/static/assets/img/logo_bigtools.svg" alt="Big Tools" class="logo">
+      </div>
+      <div class="header-right">
+        <span id="user-display" class="user-display"></span>
+        <button id="reset-button" class="admin-btn">← Máquinas</button>
+        <button id="admin-button" class="admin-btn" onclick="window.location.href='/admin'">Administración</button>
+        <button id="logout-button" class="admin-btn logout-btn">Cerrar Sesión</button>
+      </div>
+    </header>
+    <main class="chat-container">
+      <div id="chat-window" class="chat-window"></div>
+    </main>
+  </div>
+
+  <!-- ══ MODAL: Confirmar cierre de sesión ══════════════════════════════════ -->
+  <div id="logout-confirm-modal" class="confirm-overlay" style="display:none;">
+    <div class="confirm-panel">
+      <div class="confirm-icon">
+        <div class="confirm-icon-ring"></div>
+        <span class="confirm-icon-glyph">→</span>
+      </div>
+      <h3 class="confirm-title">Cerrar sesión</h3>
+      <p class="confirm-body">¿Estás seguro de que querés salir?</p>
+      <div class="confirm-actions">
+        <button class="confirm-btn-cancel" id="logout-cancel-btn">Cancelar</button>
+        <button class="confirm-btn-ok" id="logout-ok-btn">Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MODAL: Ver todos los manuales ══════════════════════════════════════ -->
+  <div id="all-manuales-modal" class="all-manuales-overlay" style="display:none;">
+    <div class="all-manuales-panel">
+      <div class="all-manuales-header">
+        <span class="all-manuales-title">Todos los manuales</span>
+        <button class="all-manuales-close-btn" id="all-manuales-close">✕</button>
+      </div>
+      <div id="all-manuales-grid" class="all-manuales-grid">
+        <p class="amc-loading">Cargando...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="/static/js/config.js"></script>
+  <script src="/static/js/main.js"></script>
+</body>
+
+</html>

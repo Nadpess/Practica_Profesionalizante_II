@@ -1,0 +1,44 @@
+==========================
+  BIG TOOLS — COMO CORRER
+==========================
+
+1. INSTALAR DEPENDENCIAS
+------------------------
+Abrir terminal en la carpeta del proyecto y correr:
+
+    cd Backend
+    pip install -r ../requirements.txt
+
+
+2. TENER OLLAMA CORRIENDO
+--------------------------
+Ollama tiene que estar activo antes de levantar el servidor.
+Si no tenés los modelos, bajarlos una sola vez:
+
+    ollama pull llama3.2:3b
+    ollama pull nomic-embed-text
+
+
+3. LEVANTAR EL SERVIDOR
+------------------------
+    cd Backend
+    uvicorn app:app --reload
+
+Abrir en el navegador: http://localhost:8000
+
+
+4. USUARIO Y CONTRASEÑA
+------------------------
+    admin   / 1234    (acceso al panel de administracion)
+    tecnico / 1234    (acceso al sistema)
+
+
+5. INDEXAR MANUALES (primera vez o cuando se re-indexa)
+--------------------------------------------------------
+- Entrar como admin
+- Ir a Panel de administracion > tab RAG
+- Subir el PDF y hacer click en Indexar
+- Esperar que llegue al 100%
+
+NOTA: el vectorstore se genera localmente y NO esta en el repo.
+Cada maquina que corra el proyecto tiene que indexar los manuales.

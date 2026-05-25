@@ -1,0 +1,28 @@
+INSTRUCCIONES PARA AGREGAR IMÁGENES DE LAS MÁQUINAS
+====================================================
+
+Por favor, agrega las siguientes imágenes en esta carpeta:
+Frontend/assets/img/
+
+Imágenes necesarias:
+-------------------
+1. hidrolavadora.jpg - Imagen de la Hidrolavadora Kärcher
+2. generador.jpg - Imagen del Generador Generac Guardian
+3. motor.jpg - Imagen del Motor Cummins
+4. soldadora.jpg - Imagen de la Soldadora Miller Ranger 305D
+
+Especificaciones recomendadas:
+------------------------------
+- Formato: JPG o PNG
+- Tamaño recomendado: 400x300 px (o similar proporción 4:3)
+- Peso máximo: 500 KB por imagen
+- Calidad: Media-Alta (para web)
+
+Nota: Mientras no agregues las imágenes, aparecerá un icono de "imagen no encontrada"
+pero el sistema funcionará normalmente.
+
+Puedes buscar las imágenes en:
+- Fotos propias de las máquinas
+- Sitios web oficiales de las marcas
+- Banco de imágenes libres (con licencia)
+
