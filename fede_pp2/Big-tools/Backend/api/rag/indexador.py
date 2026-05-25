@@ -62,10 +62,79 @@ def _obtener_seccion_para_pagina(pagina: int, secciones: list) -> str:
     return seccion_actual
 
 
+def _reformatear_filas_tabla(filas: list) -> list:
+    """
+    Si las filas contienen encabezados SINTOMA/CAUSA/ACCION, convierte cada
+    fila a texto natural para mejorar la calidad del embedding.
+    "EL COMPRESOR NO ARRANCA | Interruptor abierto | Cerrar el seccionador"
+    -> "Síntoma: EL COMPRESOR NO ARRANCA. Causa probable: Interruptor abierto. Acción correctiva: Cerrar el seccionador."
+    """
+    es_tabla_averias = any(
+        "|" in f and any(kw in f.lower() for kw in ["sintoma", "symptom", "causa", "fault"])
+        for f in filas
+    )
+    if not es_tabla_averias:
+        return filas
+
+    resultado = []
+    sintoma_actual = ""
+
+    for fila in filas:
+        partes = [p.strip() for p in fila.split("|")]
+
+        # Encabezado de columnas → saltar
+        if len(partes) >= 2 and any(kw in partes[0].lower() for kw in ["sintoma", "symptom", "fault"]):
+            continue
+
+        # Fila sin pipes
+        if len(partes) == 1:
+            texto = partes[0].strip()
+            # Sintoma ALL_CAPS sin digitos → actualizar sintoma actual
+            if (texto.upper() == texto
+                    and len(texto.split()) >= 2
+                    and not any(c.isdigit() for c in texto)):
+                sintoma_actual = texto
+                # No agregar sola: se incorpora en las filas de causa/accion siguientes
+            else:
+                resultado.append(fila)
+            continue
+
+        # Fila con pipes
+        col1 = partes[0].strip()
+        col2 = partes[1].strip() if len(partes) > 1 else ""
+        col3 = partes[2].strip() if len(partes) > 2 else ""
+
+        # Col1 es sintoma si es ALL_CAPS sin digitos
+        col1_es_sintoma = (col1.upper() == col1
+                           and len(col1.split()) >= 2
+                           and not any(c.isdigit() for c in col1))
+
+        if col1_es_sintoma:
+            sintoma_actual = col1
+            causa  = col2
+            accion = col3
+        else:
+            causa  = col1
+            accion = col2
+
+        if not sintoma_actual:
+            resultado.append(fila)
+            continue
+
+        partes_nat = [f"Sintoma: {sintoma_actual}"]
+        if causa:
+            partes_nat.append(f"Causa probable: {causa}")
+        if accion:
+            partes_nat.append(f"Accion correctiva: {accion}")
+        resultado.append(". ".join(partes_nat) + ".")
+
+    return resultado if resultado else filas
+
+
 def _filas_por_posicion(pagina) -> list:
     """
     Para paginas con tablas: agrupa lineas por coordenada Y.
-    Cada fila -> "COL1 | COL2 | COL3".
+    Cada fila -> texto natural reconstruido desde columnas SINTOMA/CAUSA/ACCION.
     Intenta find_tables() (PyMuPDF >= 1.23) primero, luego fallback Y-position.
     """
     try:
@@ -79,7 +148,7 @@ def _filas_por_posicion(pagina) -> list:
                     if len(texto.split()) >= 2:
                         filas.append(texto)
             if filas:
-                return filas
+                return _reformatear_filas_tabla(filas)
     except AttributeError:
         pass
 
@@ -118,34 +187,46 @@ def _filas_por_posicion(pagina) -> list:
         grupo.sort(key=lambda l: l["x"])
         texto_fila = " ".join(" | ".join(l["texto"] for l in grupo).split())
         palabras = texto_fila.split()
-        # Incluir si tiene >= 2 palabras, O si es una palabra ALL_CAPS sola
-        # (pueden ser fragmentos de sintomas partidos en varias lineas, ej: "ARRANCA")
         es_caps_solo = (len(palabras) == 1
                         and texto_fila.strip().upper() == texto_fila.strip()
                         and texto_fila.strip().isalpha())
         if len(palabras) >= 2 or es_caps_solo:
             resultado.append(texto_fila)
 
-    # ── Merge fragmentos de sintoma partidos (ej: "EL COMPRESOR NO" + "ARRANCA") ──
-    # Un fragmento ALL_CAPS sin pipes que sigue a otro fragmento ALL_CAPS sin pipes
-    # es continuacion del nombre del sintoma → se fusionan en una sola fila.
+    # ── Merge fragmentos de sintoma partidos ────────────────────────────────────
+    # "EL COMPRESOR NO" + fila_causa_accion + "ARRANCA"
+    # → "EL COMPRESOR NO ARRANCA"
+    # Condiciones: fragmento ALL_CAPS sin digitos, con max 2 filas intermedias.
     merged = []
+    caps_pendiente_idx = -1
+    rows_since_caps    = 0
+
     for fila in resultado:
-        partes = fila.split(" | ")
+        partes  = fila.split(" | ")
         primera = partes[0].strip()
         es_solo_caps = (len(partes) == 1
                         and primera.upper() == primera
                         and len(primera) > 1
-                        and primera not in ("SINTOMA", "SYMPTOM"))
-        if (es_solo_caps and merged
-                and "|" not in merged[-1]
-                and merged[-1].strip().upper() == merged[-1].strip()):
-            # Fusionar con la fila anterior (ambas son ALL_CAPS sin causa/accion)
-            merged[-1] = merged[-1] + " " + primera
+                        and primera not in ("SINTOMA", "SYMPTOM")
+                        and not any(c.isdigit() for c in primera))
+        if es_solo_caps:
+            if caps_pendiente_idx >= 0 and rows_since_caps <= 2:
+                merged[caps_pendiente_idx] = merged[caps_pendiente_idx] + " " + primera
+                caps_pendiente_idx = -1
+                rows_since_caps    = 0
+            else:
+                caps_pendiente_idx = len(merged)
+                rows_since_caps    = 0
+                merged.append(fila)
         else:
             merged.append(fila)
+            if caps_pendiente_idx >= 0:
+                rows_since_caps += 1
+                if rows_since_caps > 2:
+                    caps_pendiente_idx = -1
+                    rows_since_caps    = 0
 
-    return merged
+    return _reformatear_filas_tabla(merged)
 
 
 def _tiene_tabla(pagina, bloques_raw: list) -> bool:
@@ -227,8 +308,8 @@ def chunkear_bloques(bloques: list, secciones: list) -> list:
             _flush(buffer_palabras, buffer_pagina, buffer_seccion)
             overlap         = buffer_palabras[-CHUNK_OVERLAP:] if len(buffer_palabras) > CHUNK_OVERLAP else buffer_palabras[:]
             buffer_palabras = overlap
-            buffer_pagina  = pagina_bloque
-            buffer_seccion = seccion_bloque
+            buffer_pagina   = pagina_bloque
+            buffer_seccion  = seccion_bloque
 
         if not buffer_palabras:
             buffer_pagina  = pagina_bloque

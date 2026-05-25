@@ -290,7 +290,7 @@ def generar_respuesta_stream(nombre_maquina: str, pregunta: str, modo_analisis: 
             model="llama3.2:3b",
             prompt=prompt,
             stream=True,
-            options={"num_predict": 400, "temperature": 0.1, "num_ctx": 2048}
+            options={"num_predict": 400, "temperature": 0.1, "num_ctx": 4096}
         ):
             token = chunk.get("response", "")
             if token:
@@ -343,7 +343,7 @@ def generar_respuesta_stream_conversacional(
             model="llama3.2:3b",
             prompt=prompt,
             stream=True,
-            options={"num_predict": 400, "temperature": 0.1, "num_ctx": 2048}
+            options={"num_predict": 400, "temperature": 0.1, "num_ctx": 4096}
         ):
             token = chunk.get("response", "")
             if token:

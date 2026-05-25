@@ -390,11 +390,11 @@
       "falla": "Desgaste de componentes mecánicos"
     }
   ],
-  "total_consultas_rag": 73,
+  "total_consultas_rag": 77,
   "consultas_rag_por_maquina": {
     "Motor Cummins": 10,
     "manual_cummins_2": 27,
-    "compresor": 13,
+    "compresor": 17,
     "motosoldadora_ranger": 5,
     "Soldadora Miller Ranger 305D": 13,
     "Hidrolavadora Kärcher": 4,
