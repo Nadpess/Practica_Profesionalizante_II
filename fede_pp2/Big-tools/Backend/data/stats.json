@@ -1,10 +1,10 @@
 {
-  "total_diagnosticos": 210,
+  "total_diagnosticos": 215,
   "diagnosticos_por_maquina": {
     "generador_generac": 48,
-    "motor_cummins": 53,
-    "soldadora_miller_ranger": 40,
-    "hidrolavadora_karcher": 59,
+    "motor_cummins": 55,
+    "soldadora_miller_ranger": 42,
+    "hidrolavadora_karcher": 60,
     "prueba": 3,
     "diagnostico": 1,
     "compresor": 2,
@@ -16,19 +16,19 @@
     "motor_cummins|Problemas de sobrecalentamiento": 28,
     "soldadora_miller_ranger|Problemas con salida auxiliar (tomas de corriente)": 6,
     "generador_generac|Problemas de arranque del motor": 4,
-    "motor_cummins|Problemas de arranque": 3,
-    "soldadora_miller_ranger|Sin salida de soldadura": 7,
+    "motor_cummins|Problemas de arranque": 4,
+    "soldadora_miller_ranger|Sin salida de soldadura": 8,
     "hidrolavadora_karcher|Una luz parpadea": 15,
     "generador_generac|Otros problemas de funcionamiento": 9,
     "soldadora_miller_ranger|Sobrecalentamiento de la unidad": 11,
-    "hidrolavadora_karcher|El quemador no se enciende (el agua no calienta)": 16,
-    "soldadora_miller_ranger|Problemas de arranque del motor": 4,
+    "hidrolavadora_karcher|El quemador no se enciende (el agua no calienta)": 17,
+    "soldadora_miller_ranger|Problemas de arranque del motor": 5,
     "soldadora_miller_ranger|Calidad de soldadura deficiente": 8,
     "hidrolavadora_karcher|Una luz está encendida (fija)": 8,
     "hidrolavadora_karcher|El aparato no genera presión": 6,
     "motor_cummins|Pérdida de potencia": 17,
     "hidrolavadora_karcher|El aparato no funciona o no se pone en marcha": 14,
-    "motor_cummins|Humo excesivo": 3,
+    "motor_cummins|Humo excesivo": 4,
     "soldadora_miller_ranger|Motor funciona irregular o se apaga": 4,
     "motor_cummins|Presión de aceite anormal": 2,
     "prueba|Problemas de Rendimiento": 2,
@@ -42,40 +42,6 @@
     "compresor_de_prueba|Problemas Mecánicos": 1
   },
   "historial": [
-    {
-      "timestamp": "2025-11-09T18:47:58.965645",
-      "maquina": "hidrolavadora_karcher",
-      "categoria": "El quemador no se enciende (el agua no calienta)",
-      "completado": true,
-      "falla": "El recipiente de producto de mantenimiento del sistema está vacío"
-    },
-    {
-      "timestamp": "2025-11-09T18:48:06.673731",
-      "maquina": "hidrolavadora_karcher",
-      "categoria": "Una luz está encendida (fija)",
-      "completado": true,
-      "falla": "Depósito de combustible vacío"
-    },
-    {
-      "timestamp": "2025-11-09T18:48:20.109320",
-      "maquina": "hidrolavadora_karcher",
-      "categoria": "El aparato no funciona o no se pone en marcha",
-      "completado": false
-    },
-    {
-      "timestamp": "2025-11-09T18:57:23.963988",
-      "maquina": "hidrolavadora_karcher",
-      "categoria": "El aparato no funciona o no se pone en marcha",
-      "completado": true,
-      "falla": "No hay tensión de red"
-    },
-    {
-      "timestamp": "2025-11-09T18:57:45.049042",
-      "maquina": "generador_generac",
-      "categoria": "Problemas con luces LED o alarmas",
-      "completado": true,
-      "falla": "Problema con el cargador de batería"
-    },
     {
       "timestamp": "2025-11-09T18:57:51.070346",
       "maquina": "soldadora_miller_ranger",
@@ -388,16 +354,52 @@
       "categoria": "Problemas Mecánicos",
       "completado": true,
       "falla": "Desgaste de componentes mecánicos"
+    },
+    {
+      "timestamp": "2026-05-26T19:32:30.555368",
+      "maquina": "motor_cummins",
+      "categoria": "Problemas de arranque",
+      "completado": true,
+      "falla": "Falta de combustible o aire en el sistema"
+    },
+    {
+      "timestamp": "2026-05-26T19:34:14.095312",
+      "maquina": "motor_cummins",
+      "categoria": "Humo excesivo",
+      "completado": true,
+      "falla": "Combustión incompleta o exceso de combustible"
+    },
+    {
+      "timestamp": "2026-05-27T21:43:07.807771",
+      "maquina": "soldadora_miller_ranger",
+      "categoria": "Problemas de arranque del motor",
+      "completado": true,
+      "falla": "Fusible del circuito de arranque quemado"
+    },
+    {
+      "timestamp": "2026-05-29T19:39:50.467062",
+      "maquina": "soldadora_miller_ranger",
+      "categoria": "Sin salida de soldadura",
+      "completado": true,
+      "falla": "Cables de soldadura desconectados o dañados"
+    },
+    {
+      "timestamp": "2026-05-29T19:41:50.821577",
+      "maquina": "hidrolavadora_karcher",
+      "categoria": "El quemador no se enciende (el agua no calienta)",
+      "completado": true,
+      "falla": "El filtro de combustible está sucio"
     }
   ],
-  "total_consultas_rag": 77,
+  "total_consultas_rag": 101,
   "consultas_rag_por_maquina": {
     "Motor Cummins": 10,
     "manual_cummins_2": 27,
-    "compresor": 17,
+    "compresor": 37,
     "motosoldadora_ranger": 5,
     "Soldadora Miller Ranger 305D": 13,
-    "Hidrolavadora Kärcher": 4,
-    "hidrolavadora_karcher": 1
+    "Hidrolavadora Kärcher": 5,
+    "hidrolavadora_karcher": 2,
+    "motor_cummins": 2
   }
 }

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Big Tools — Propuesta de rediseño</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand:#d32f2f;          /* rojo Big Tools */
+  --brand-dark:#a51c1c;
+  --brand-tint:#fdecec;
+  --ink:#1b1b1d;
+  --ink-soft:#6a6a70;
+  --line:#e9e6e6;
+  --bg:#f6f4f4;
+  --surface:#ffffff;
+  --ok:#1d9e75; --warn:#e6a700; --crit:#d32f2f;
+  --r:14px; --r-sm:10px;
+  --sans:'Inter',system-ui,sans-serif;
+  --display:'Space Grotesk',var(--sans);
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 10px 30px rgba(20,10,10,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+.page{max-width:1080px;margin:0 auto;padding:40px 24px 80px}
+.note{font-size:13px;color:var(--ink-soft);background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 18px;margin-bottom:34px}
+.note b{color:var(--brand-dark);font-weight:600}
+.seclabel{font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);margin:46px 0 14px}
+.frame{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+
+/* ── Topbar ── */
+.tb{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px;font-family:var(--display);font-weight:700;letter-spacing:-.01em;font-size:18px}
+.brand .mark{width:30px;height:30px;border-radius:8px;background:var(--brand);display:grid;place-items:center;color:#fff;font-size:15px;font-weight:700}
+.tb-right{display:flex;align-items:center;gap:10px}
+.chip{font-size:12.5px;color:var(--ink-soft);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:6px 13px}
+.btn{font-family:var(--sans);font-size:13px;font-weight:500;border-radius:9px;padding:8px 14px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;transition:.15s}
+.btn:hover{border-color:#d8d3d3;background:#fafafa}
+.btn-primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn-primary:hover{background:var(--brand-dark);border-color:var(--brand-dark)}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--ink-soft)}
+
+/* ── Selección de manuales (orbit + grid) ── */
+.sel{padding:34px 30px 40px;text-align:center}
+.eyebrow{font-family:var(--display);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+.sel h1{font-family:var(--display);font-weight:600;font-size:25px;margin:8px 0 28px;letter-spacing:-.01em}
+.orbit{position:relative;width:330px;height:330px;margin:0 auto 26px}
+.ring{position:absolute;inset:0;border:1.5px dashed #e3dede;border-radius:50%}
+.ring.r2{inset:46px;border-style:solid;border-color:#efeaea}
+.hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:118px;height:118px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:17px;line-height:1.05;box-shadow:0 10px 26px rgba(211,47,47,.32)}
+.node{position:absolute;transform:translate(-50%,-50%);background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 13px;font-size:13px;font-weight:500;box-shadow:var(--shadow);white-space:nowrap;cursor:pointer;transition:.15s}
+.node:hover{border-color:var(--brand);color:var(--brand-dark);transform:translate(-50%,-50%) scale(1.04)}
+.node .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ok);margin-right:7px;vertical-align:1px}
+.n1{top:8%;left:50%}.n2{top:50%;left:96%}.n3{top:92%;left:62%}.n4{top:88%;left:24%}.n5{top:34%;left:5%}
+.morelink{font-size:13px;color:var(--brand-dark);font-weight:500;cursor:pointer;border:0;background:none}
+
+/* ── Chat ── */
+.chat-head{display:flex;align-items:center;gap:10px;padding:14px 22px;border-bottom:1px solid var(--line)}
+.machine-pill{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px}
+.machine-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.tag{font-size:11px;font-weight:600;color:var(--brand-dark);background:var(--brand-tint);border-radius:999px;padding:3px 9px}
+.chat-body{padding:24px 22px;background:linear-gradient(180deg,#fbfafa,#f6f4f4);display:flex;flex-direction:column;gap:16px}
+.msg{max-width:82%;font-size:14px;border-radius:14px;padding:12px 15px}
+.msg.user{align-self:flex-end;background:var(--brand);color:#fff;border-bottom-right-radius:5px}
+.msg.bot{align-self:flex-start;background:#fff;border:1px solid var(--line);border-bottom-left-radius:5px;box-shadow:var(--shadow)}
+.diag{align-self:flex-start;max-width:88%;background:#fff;border:1px solid var(--line);border-left:4px solid var(--crit);border-radius:14px;border-bottom-left-radius:5px;box-shadow:var(--shadow);overflow:hidden}
+.diag-h{display:flex;align-items:center;gap:9px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.sev{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--crit);border-radius:6px;padding:3px 8px}
+.diag-h .ttl{font-family:var(--display);font-weight:600;font-size:14px}
+.diag-b{padding:14px 16px;font-size:13.5px;color:#2c2c30}
+.diag-b h4{font-family:var(--display);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin:12px 0 5px;font-weight:600}
+.diag-b h4:first-child{margin-top:0}
+.diag-b ol{margin:0;padding-left:18px}
+.diag-b li{margin:3px 0}
+.refs{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:11px 16px;border-top:1px solid var(--line);background:#fbfafa}
+.pageref{font-size:12px;color:var(--ink-soft);background:#fff;border:1px solid var(--line);border-radius:7px;padding:3px 9px}
+.conf{font-size:12px;font-weight:600;color:var(--ok);margin-left:auto}
+.diag-actions{display:flex;align-items:center;gap:8px;padding:0 16px 14px}
+.fb{display:flex;gap:6px;margin-left:auto}
+.fb button{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:14px}
+.fb button:hover{border-color:var(--brand);background:var(--brand-tint)}
+.ai-btn{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:#fff;background:var(--brand);border:0;border-radius:9px;padding:9px 15px;cursor:pointer}
+.composer{display:flex;gap:10px;padding:14px 18px;border-top:1px solid var(--line);background:#fff}
+.composer input{flex:1;border:1px solid var(--line);border-radius:11px;padding:11px 14px;font-family:var(--sans);font-size:14px;outline:none}
+.composer input:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-tint)}
+
+/* ── Admin ── */
+.adm{display:grid;grid-template-columns:200px 1fr;min-height:360px}
+.adm-side{border-right:1px solid var(--line);padding:18px 14px;background:#fbfafa}
+.adm-side .item{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:500;color:var(--ink-soft);padding:9px 11px;border-radius:9px;cursor:pointer}
+.adm-side .item.active{background:var(--brand-tint);color:var(--brand-dark)}
+.adm-side .item:hover:not(.active){background:#f1eeee}
+.adm-main{padding:22px 24px}
+.adm-main h2{font-family:var(--display);font-weight:600;font-size:18px;margin-bottom:4px}
+.adm-main .sub{font-size:13px;color:var(--ink-soft);margin-bottom:18px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:#fbfafa;border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.kpi .v{font-family:var(--display);font-weight:700;font-size:22px}
+.kpi .l{font-size:12px;color:var(--ink-soft)}
+.mtable{width:100%;border-collapse:collapse;font-size:13.5px}
+.mtable th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;padding:9px 10px;border-bottom:1px solid var(--line)}
+.mtable td{padding:11px 10px;border-bottom:1px solid var(--line)}
+.badge{font-size:11px;font-weight:600;border-radius:999px;padding:3px 9px}
+.badge.ok{color:var(--ok);background:#e4f5ee}
+.badge.no{color:var(--ink-soft);background:#f0eded}
+.iconbtn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 9px;font-size:12px;cursor:pointer;color:var(--ink-soft)}
+.iconbtn:hover{border-color:var(--brand);color:var(--brand-dark)}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="note">
+    <b>Propuesta de rediseño — Big Tools.</b> Marca blanco + rojo respetada (<b>#d32f2f</b>).
+    Tipografía nueva: <b>Space Grotesk</b> para títulos (técnica, industrial) + <b>Inter</b> para texto.
+    Superficies blancas, neutros cálidos, bordes finos y una sombra suave. Es una maqueta estática
+    para definir la dirección visual; si te gusta, lo aplico al CSS real (orbit, chat y admin).
+  </div>
+
+  <!-- 1. SELECCIÓN -->
+  <div class="seclabel">1 · Selección de manuales</div>
+  <div class="frame">
+    <div class="tb">
+      <div class="brand"><span class="mark">BT</span> Big Tools</div>
+      <div class="tb-right">
+        <span class="chip">Hola, Fede</span>
+        <button class="btn">Administración</button>
+        <button class="btn btn-ghost">Salir</button>
+      </div>
+    </div>
+    <div class="sel">
+      <span class="eyebrow">Seleccioná una máquina</span>
+      <h1>¿Con qué equipo trabajamos hoy?</h1>
+      <div class="orbit">
+        <div class="ring"></div><div class="ring r2"></div>
+        <div class="hub">BIG<br>TOOLS</div>
+        <div class="node n1"><span class="dot"></span>Hidrolavadora Kärcher</div>
+        <div class="node n2"><span class="dot"></span>Generador Generac</div>
+        <div class="node n3"><span class="dot"></span>Motor Cummins</div>
+        <div class="node n4"><span class="dot"></span>Soldadora Miller</div>
+        <div class="node n5"><span class="dot"></span>Compresor</div>
+      </div>
+      <button class="morelink">+ Ver todos los manuales</button>
+    </div>
+  </div>
+
+  <!-- 2. CHAT -->
+  <div class="seclabel">2 · Diagnóstico / chat</div>
+  <div class="frame">
+    <div class="chat-head">
+      <span class="machine-pill"><span class="dot"></span> Compresor</span>
+      <span class="tag">consulta libre</span>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <button class="btn">← Máquinas</button>
+        <button class="btn btn-ghost">🔄 Nueva</button>
+      </div>
+    </div>
+    <div class="chat-body">
+      <div class="msg user">El compresor no arranca</div>
+      <div class="diag">
+        <div class="diag-h"><span class="sev">Crítico</span><span class="ttl">El compresor no arranca</span></div>
+        <div class="diag-b">
+          <h4>Causa probable</h4>
+          Interruptor general abierto o fusible del circuito de control fundido.
+          <h4>Procedimiento</h4>
+          <ol>
+            <li>Cerrar el seccionador / interruptor general.</li>
+            <li>Revisar y reemplazar el fusible del circuito si está fundido.</li>
+            <li>Verificar el fusible del transformador de control.</li>
+            <li>Comprobar la tensión de alimentación.</li>
+          </ol>
+        </div>
+        <div class="refs">
+          <span class="pageref">📄 Compresor.pdf · Pág. 59</span>
+          <span class="pageref">Sección 7 — Búsqueda de averías</span>
+          <span class="conf">Confianza 82%</span>
+        </div>
+        <div class="diag-actions">
+          <button class="ai-btn">🔍 Profundizar con IA</button>
+          <div class="fb"><button title="Útil">👍</button><button title="No sirvió">👎</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="composer">
+      <input placeholder="Escribí otra consulta sobre el manual…">
+      <button class="btn btn-primary">Consultar →</button>
+    </div>
+  </div>
+
+  <!-- 3. ADMIN -->
+  <div class="seclabel">3 · Administración</div>
+  <div class="frame">
+    <div class="tb">
+      <div class="brand"><span class="mark">BT</span> Big Tools <span style="font-family:var(--sans);font-weight:500;font-size:12px;color:var(--ink-soft);border-left:1px solid var(--line);padding-left:11px;margin-left:4px">Panel admin</span></div>
+      <div class="tb-right"><span class="chip">admin</span><button class="btn">← Volver</button></div>
+    </div>
+    <div class="adm">
+      <div class="adm-side">
+        <div class="item active">📚 Manuales</div>
+        <div class="item">📊 Estadísticas</div>
+        <div class="item">🌳 Árboles SE</div>
+        <div class="item">⚙️ Ajustes</div>
+      </div>
+      <div class="adm-main">
+        <h2>Manuales</h2>
+        <div class="sub">Subí, indexá y gestioná los manuales del sistema.</div>
+        <div class="kpis">
+          <div class="kpi"><div class="v">6</div><div class="l">Manuales</div></div>
+          <div class="kpi"><div class="v">5</div><div class="l">Indexados</div></div>
+          <div class="kpi"><div class="v">4</div><div class="l">Con árbol SE</div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <strong style="font-family:var(--display);font-size:14px">Listado</strong>
+          <button class="btn btn-primary">⤴ Subir manual</button>
+        </div>
+        <table class="mtable">
+          <thead><tr><th>Manual</th><th>Estado</th><th>Tipo</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Compresor</td><td><span class="badge ok">Indexado</span></td><td>Consulta libre</td><td style="text-align:right"><button class="iconbtn">Reindexar</button> <button class="iconbtn">Eliminar</button></td></tr>
+            <tr><td>Hidrolavadora Kärcher</td><td><span class="badge ok">Indexado</span></td><td>Árbol SE</td><td style="text-align:right"><button class="iconbtn">Reindexar</button> <button class="iconbtn">Eliminar</button></td></tr>
+            <tr><td>Motor Cummins</td><td><span class="badge ok">Indexado</span></td><td>Árbol SE</td><td style="text-align:right"><button class="iconbtn">Reindexar</button> <button class="iconbtn">Eliminar</button></td></tr>
+            <tr><td>Motosoldadora Ranger</td><td><span class="badge no">Sin indexar</span></td><td>Consulta libre</td><td style="text-align:right"><button class="iconbtn">Indexar</button> <button class="iconbtn">Eliminar</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

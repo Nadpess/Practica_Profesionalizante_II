@@ -9,7 +9,15 @@
     --error-color: #ff5252;
     --success-color: #4caf50;
     --border-radius: 8px;
-    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-display: 'Space Grotesk', 'Inter', sans-serif;
+    --brand-dark: #a51c1c;
+    --brand-tint: #fdecec;
+    --ink: #1b1b1d;
+    --ink-soft: #6a6a70;
+    --line: #e9e6e6;
+    --bg-soft: #f6f4f4;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 10px 30px rgba(20,10,10,.06);
 }
 
 /* ---------------------------
@@ -819,4 +827,70 @@ body {
 .export-pdf-btn:active {
     transform: translateY(0);
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   REDISEÑO — Panel de administración (tema claro limpio, alineado al resto)
+═══════════════════════════════════════════════════════════════════ */
+body { background-color: var(--bg-soft); color: var(--ink); }
+
+.header {
+    background-color: #fff;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+    box-shadow: none;
+    padding: 12px 26px;
+}
+.header h1 { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; color: var(--ink); }
+.header .logo { height: 34px; }
+.username-display { color: var(--ink-soft); font-weight: 500; font-size: .85rem; }
+
+.logout-btn, .back-btn {
+    background-color: #fff; color: var(--ink); border: 1px solid var(--line);
+    border-radius: 9px; font-weight: 500; font-size: .82rem;
+}
+.logout-btn:hover, .back-btn:hover { background-color: var(--bg-soft); color: var(--brand-dark); border-color: var(--primary-color); }
+.logout-btn { color: var(--brand-dark); }
+
+.dashboard-content h2 { font-family: var(--font-display); color: var(--ink); font-weight: 600; font-size: 1.5rem; }
+
+.tabs { border-bottom: 1px solid var(--line); gap: 4px; }
+.tab-btn { font-family: var(--font-family); color: var(--ink-soft); font-weight: 500; font-size: .9rem; border-radius: 8px 8px 0 0; }
+.tab-btn:hover { color: var(--brand-dark); background-color: var(--brand-tint); }
+.tab-btn.active { color: var(--brand-dark); border-bottom-color: var(--primary-color); }
+
+.stat-card { border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); }
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.stat-info h3, .stat-header h3 { color: var(--ink); }
+.stat-header h3 { font-family: var(--font-display); font-weight: 600; }
+.stat-number { font-family: var(--font-display); color: var(--primary-color); }
+
+.stat-item, .manual-item {
+    background-color: #fff; border: 1px solid var(--line);
+    border-left: 3px solid var(--primary-color); border-radius: 10px;
+}
+.stat-name, .manual-info h4 { color: var(--ink); }
+.stat-detail, .manual-info p { color: var(--ink-soft); }
+.stat-rank, .stat-value { color: var(--primary-color); }
+
+.historial-table th {
+    background-color: var(--bg-soft); color: var(--ink-soft); font-weight: 600;
+    font-size: .76rem; text-transform: uppercase; letter-spacing: .04em;
+}
+.historial-table td { border-bottom: 1px solid var(--line); color: var(--ink); }
+.historial-table tr:hover { background-color: var(--bg-soft); }
+
+.refresh-btn, .upload-btn { background-color: var(--primary-color); border-radius: 10px; font-weight: 600; }
+.refresh-btn:hover { background-color: var(--brand-dark); transform: none; }
+.upload-btn:hover { background-color: var(--brand-dark); }
+
+.form-group label { color: var(--ink); font-weight: 500; }
+.form-group select,
+.form-group input[type="text"],
+.form-group input[type="file"] {
+    border: 1px solid var(--line); border-radius: 10px; font-family: var(--font-family); color: var(--ink);
+}
+.form-group select:focus, .form-group input:focus {
+    border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--brand-tint);
+}
+.manual-btn { border-radius: 9px; font-weight: 500; }
 

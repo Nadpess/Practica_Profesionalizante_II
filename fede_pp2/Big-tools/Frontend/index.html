@@ -6,7 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Big Tools - Asistente</title>
   <link rel="icon" href="/static/assets/img/logo_bigtools.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/playfair-display@5/700.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/style.css">
 </head>
 
@@ -71,14 +73,19 @@
 
     <div class="orbit-body">
 
-      <!-- Estado 1: selector de máquina -->
+      <!-- Estado 1: selector de máquina (buscador) -->
       <div id="orbit-sel" class="orbit-panel">
-        <span class="orbit-eyebrow">Seleccioná una máquina</span>
-        <div class="orbit-wrap" id="orbit-wrap">
-          <div class="orbit-spin" id="orbit-spin"></div>
-          <div class="orbit-hub">BIG<br>TOOLS</div>
+        <div class="bsc">
+          <span class="bsc-eyebrow">Selección de equipo</span>
+          <h1 class="bsc-title">¿Qué equipo vas a diagnosticar?</h1>
+          <div class="bsc-searchbox">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4"></path></svg>
+            <input id="bsc-input" type="text" placeholder="Buscá por nombre, marca o tipo…" autocomplete="off">
+          </div>
+          <div class="bsc-chips" id="bsc-chips"></div>
+          <div class="bsc-listlabel" id="bsc-listlabel">Más consultados</div>
+          <div class="bsc-list" id="bsc-list"></div>
         </div>
-        <button class="orbit-more-btn" id="orbit-more-btn">+ Ver todos los manuales</button>
       </div>
 
       <!-- Estado 2: selector de modo -->
@@ -129,6 +136,7 @@
     </header>
     <main class="chat-container">
       <div id="chat-window" class="chat-window"></div>
+      <p class="ai-disclaimer">⚠️ Las respuestas las genera una IA y pueden contener errores. Verificá siempre contra el manual.</p>
     </main>
   </div>
 

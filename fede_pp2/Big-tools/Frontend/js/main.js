@@ -66,71 +66,127 @@ let _orbitSheet = null;  // stylesheet para keyframes dinámicos
  * Construye el carrusel con la lista de máquinas.
  * @param {string[]} maquinas
  */
-function buildOrbit(maquinas) {
-  const spin = document.getElementById('orbit-spin');
-  if (!spin) return;
-  spin.innerHTML = '';   // limpiar si se llama de nuevo
+/* ── Selector buscador (reemplaza al orbit) ───────────────────────────────── */
+let _bscTodas = [];
+let _bscRubro = 'todos';
+let _bscQuery = '';
 
-  // Obtener stylesheet para insertar keyframes dinámicos
-  // IMPORTANTE: no usar document.styleSheets[0] porque puede apuntar a una
-  // hoja cross-origin (CDN Playfair) que lanza SecurityError en insertRule().
-  if (!_orbitSheet) {
-    let styleEl = document.getElementById('orbit-keyframes');
-    if (!styleEl) {
-      styleEl = document.createElement('style');
-      styleEl.id = 'orbit-keyframes';
-      document.head.appendChild(styleEl);
-    }
-    _orbitSheet = styleEl.sheet;
+const _BSC_RUBROS = [
+  { id: 'motores',     label: 'Motores',        kw: ['motor'] },
+  { id: 'soldadoras',  label: 'Soldadoras',     kw: ['soldad'] },
+  { id: 'compresores', label: 'Compresores',    kw: ['compresor'] },
+  { id: 'generadores', label: 'Generadores',    kw: ['generad', 'generac'] },
+  { id: 'hidro',       label: 'Hidrolavadoras', kw: ['hidrolav', 'lavadora'] },
+];
+
+function _bscRubroDe(nombre) {
+  const n = (nombre || '').toLowerCase();
+  for (const r of _BSC_RUBROS) {
+    if (r.kw.some(k => n.includes(k))) return r;
+  }
+  return { id: 'otros', label: 'Otros' };
+}
+
+function _bscIcono() {
+  return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"></circle>'
+       + '<path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"></path></svg>';
+}
+
+/** Construye el buscador con la lista de máquinas. */
+function buildBuscador(maquinas) {
+  _bscTodas = (maquinas || []).slice();
+
+  const chipsEl = document.getElementById('bsc-chips');
+  if (chipsEl) {
+    chipsEl.innerHTML = '';
+    chipsEl.appendChild(_bscChip('todos', 'Todos', _bscRubro === 'todos'));
+    const vistos = new Set();
+    _bscTodas.forEach(m => {
+      const r = _bscRubroDe(m);
+      if (!vistos.has(r.id)) {
+        vistos.add(r.id);
+        chipsEl.appendChild(_bscChip(r.id, r.label, _bscRubro === r.id));
+      }
+    });
   }
 
-  maquinas.forEach((nombre, i) => {
-    const angle = (i * 360 / maquinas.length) - 90;
-    const kfName = `orbit-kf-${i}`;
+  const inp = document.getElementById('bsc-input');
+  if (inp && !inp._wired) {
+    inp._wired = true;
+    inp.addEventListener('input', () => {
+      _bscQuery = inp.value.toLowerCase().trim();
+      _bscRender();
+    });
+  }
 
-    // Keyframe: posiciona en el círculo + contra-rota para mantener la tarjeta upright
-    if (_orbitSheet) {
-      try {
-        _orbitSheet.insertRule(`
-          @keyframes ${kfName} {
-            from { transform: rotate(${angle}deg) translateX(${ORBIT_RADIUS}px) rotate(${-angle}deg); }
-            to   { transform: rotate(${angle}deg) translateX(${ORBIT_RADIUS}px) rotate(${-angle - 360}deg); }
-          }
-        `, _orbitSheet.cssRules.length);
-      } catch(e) {}
-    }
+  _bscRender();
+}
 
-    const mc = document.createElement('div');
-    mc.className = 'orbit-mc';
-    mc.style.animation = `${kfName} 44s linear infinite`;
-    mc.innerHTML = `
-      <div class="orbit-mc-inner">
-        <div class="mc-accent-line"></div>
-        <div class="mc-name">${nombre}</div>
-      </div>
-    `;
-    mc.addEventListener('click', () => orbitPickMachine(nombre));
-    spin.appendChild(mc);
+/** Compatibilidad: el código viejo llamaba buildOrbit(). */
+function buildOrbit(maquinas) { buildBuscador(maquinas); }
+
+function _bscChip(id, label, on) {
+  const b = document.createElement('button');
+  b.className = 'bsc-chip' + (on ? ' on' : '');
+  b.textContent = label;
+  b.dataset.id = id;
+  b.addEventListener('click', () => {
+    _bscRubro = id;
+    document.querySelectorAll('.bsc-chip').forEach(c => c.classList.toggle('on', c.dataset.id === id));
+    _bscRender();
+  });
+  return b;
+}
+
+function _bscRender() {
+  const list = document.getElementById('bsc-list');
+  const lbl  = document.getElementById('bsc-listlabel');
+  if (!list) return;
+
+  const items = _bscTodas.filter(m => {
+    const okR = _bscRubro === 'todos' || _bscRubroDe(m).id === _bscRubro;
+    const okQ = !_bscQuery || m.toLowerCase().includes(_bscQuery);
+    return okR && okQ;
+  });
+
+  if (lbl) lbl.textContent = (_bscQuery || _bscRubro !== 'todos') ? `${items.length} resultado(s)` : 'Más consultados';
+
+  list.innerHTML = '';
+  if (!items.length) {
+    list.innerHTML = '<div class="bsc-empty">No se encontraron equipos.</div>';
+    return;
+  }
+  items.forEach(m => {
+    const r = _bscRubroDe(m);
+    const row = document.createElement('button');
+    row.className = 'bsc-row';
+    row.innerHTML = `<span class="bsc-ico">${_bscIcono()}</span>`
+                  + `<span class="bsc-rowtext"><span class="bsc-rowname"></span><span class="bsc-rowcat"></span></span>`
+                  + `<span class="bsc-arr">→</span>`;
+    row.querySelector('.bsc-rowname').textContent = m;
+    row.querySelector('.bsc-rowcat').textContent = r.label;
+    row.addEventListener('click', () => orbitPickMachine(m));
+    list.appendChild(row);
   });
 }
 
 /** Transición: selector → modo (después de elegir máquina) */
-function orbitPickMachine(nombre) {
+async function orbitPickMachine(nombre) {
   sessionState.maquina = nombre;
-  document.getElementById('orbit-machine-name').textContent = nombre;
 
-  const sel  = document.getElementById('orbit-sel');
-  const mode = document.getElementById('orbit-mode');
+  // Auto-routeo (sin selector de modo): si la máquina tiene árbol de
+  // conocimiento → diagnóstico guiado (SE); si no → consulta libre RAG.
+  let cats = [];
+  try {
+    const r = await fetch(`${API_URL}/categorias/${encodeURIComponent(nombre)}`);
+    if (r.ok) cats = (await r.json()).categorias || [];
+  } catch (e) { /* si falla, cae a chat libre */ }
 
-  sel.classList.add('orbit-exit-up');
-  setTimeout(() => {
-    sel.style.display = 'none';
-    sel.classList.remove('orbit-exit-up');
-    mode.style.display = 'flex';
-    void mode.offsetWidth;
-    mode.classList.add('orbit-enter-up');
-    setTimeout(() => mode.classList.remove('orbit-enter-up'), 320);
-  }, 240);
+  if (cats.length > 0) {
+    startSEMode();
+  } else {
+    startRAGMode();
+  }
 }
 
 /** Botón "← Cambiar" / "← Volver a todas las máquinas" */
@@ -368,9 +424,9 @@ function mostrarChatbot() {
   const orbitEl = document.getElementById('orbit-screen');
   orbitEl.style.display = 'flex';
 
-  // Cargar máquinas y construir el orbit (solo si no está ya construido)
-  const spin = document.getElementById('orbit-spin');
-  if (spin && spin.children.length === 0) {
+  // Cargar máquinas y construir el buscador (solo si no está ya construido)
+  const list = document.getElementById('bsc-list');
+  if (list && list.children.length === 0) {
     _cargarMaquinasOrbit();
   }
 }
@@ -383,9 +439,8 @@ async function _cargarMaquinasOrbit() {
     const res  = await fetch(`${API_URL}/maquinas`);
     const data = await res.json();
     _todasLasMaquinas = data.maquinas || [];
-    // Orbit muestra solo las top 7 más consultadas (ya vienen ordenadas por popularidad)
-    const top7 = _todasLasMaquinas.slice(0, 7);
-    buildOrbit(top7);
+    // El buscador muestra TODAS (ya vienen ordenadas por popularidad → "Más consultados")
+    buildBuscador(_todasLasMaquinas);
   } catch(e) {
     console.error('Error cargando máquinas para orbit:', e);
   }
@@ -841,135 +896,9 @@ function _agregarBotonesFeedback(paginasEl, maquina, pregunta, ragRespuesta) {
   fb.querySelector('.feedback-neg').addEventListener('click', () => enviarFeedback(false));
 }
 
-/**
- * ══ SE DINÁMICO ══
- * Inicia diagnóstico guiado para máquinas sin árbol estático.
- */
-async function iniciarSEDinamico(nombreMaquina) {
-  addMessage(`🔍 Iniciando diagnóstico guiado para <strong>${nombreMaquina}</strong>...`);
-  sessionState.seDinamicoHistorial = [];
-  sessionState.seDinamicoActivo    = true;
-
-  try {
-    const res  = await fetch(`${API_URL}/se-dinamico/iniciar/${encodeURIComponent(nombreMaquina)}`, {
-      headers: { 'Authorization': `Bearer ${sessionState.token}` }
-    });
-    const data = await res.json();
-
-    if (!res.ok) throw new Error(data.detail || 'Error al iniciar');
-
-    _mostrarPasoSEDinamico(nombreMaquina, data.mensaje, data.opciones, data);
-  } catch(e) {
-    addMessage(`❌ No se pudo iniciar el diagnóstico: ${e.message}`);
-  }
-}
-
-function _mostrarPasoSEDinamico(nombreMaquina, preguntaTexto, opciones, pasoData = {}) {
-  const div = document.createElement('div');
-  div.className = 'message bot sed-paso';
-
-  const btnsHtml = (opciones || []).map(op =>
-    `<button class="option-btn sed-opcion">${op}</button>`
-  ).join('');
-
-  div.innerHTML = `
-    <div class="sed-pregunta">${preguntaTexto}</div>
-    <div class="options-container">${btnsHtml}</div>
-  `;
-
-  div.querySelectorAll('.sed-opcion').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const respuesta = btn.textContent;
-      // Deshabilitar opciones
-      div.querySelectorAll('.sed-opcion').forEach(b => { b.disabled = true; b.style.opacity = '0.5'; });
-      btn.style.opacity = '1'; btn.style.fontWeight = '700';
-      addMessage(respuesta, 'user');
-      await _avanzarSEDinamico(nombreMaquina, respuesta, preguntaTexto);
-    });
-  });
-
-  document.getElementById('chat-window').appendChild(div);
-  document.getElementById('chat-window').scrollTop = 99999;
-}
-
-async function _avanzarSEDinamico(nombreMaquina, respuestaUsuario, preguntaAnterior) {
-  // Agregar al historial
-  const hist = sessionState.seDinamicoHistorial;
-  if (preguntaAnterior) hist.push({ rol: 'sistema', texto: preguntaAnterior });
-  hist.push({ rol: 'usuario', texto: respuestaUsuario });
-
-  const loadingMsg = addMessage('⚙️ Analizando...');
-
-  try {
-    const res  = await fetch(`${API_URL}/se-dinamico/paso/${encodeURIComponent(nombreMaquina)}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${sessionState.token}`
-      },
-      body: JSON.stringify({
-        historial_se:      hist,
-        respuesta_usuario: respuestaUsuario,
-      })
-    });
-    const data = await res.json();
-    loadingMsg.remove();
-
-    if (!res.ok) throw new Error(data.detail || 'Error');
-
-    if (data.tipo === 'pregunta') {
-      hist.push({ rol: 'sistema', texto: data.texto });
-      _mostrarPasoSEDinamico(nombreMaquina, data.texto, data.opciones, data);
-
-    } else if (data.tipo === 'diagnostico') {
-      sessionState.seDinamicoActivo = false;
-      const pags = data.paginas?.length
-        ? `<div class="rag-paginas" style="margin-top:8px;">📄 Págs. ${data.paginas.join(', ')}</div>`
-        : '';
-      addMessage(`
-        <div class="sed-diagnostico">
-          <div class="sed-diag-header">🔧 Diagnóstico</div>
-          <div class="sed-diag-body">${data.texto}</div>
-          ${pags}
-        </div>
-      `);
-      _mostrarOpcionesPostSE(nombreMaquina);
-
-    } else {
-      addMessage(`❌ ${data.texto || 'Error inesperado.'}`);
-    }
-  } catch(e) {
-    loadingMsg.remove();
-    addMessage(`❌ Error: ${e.message}`);
-  }
-}
-
-function _mostrarOpcionesPostSE(nombreMaquina) {
-  const div = document.createElement('div');
-  div.className = 'message bot';
-  div.innerHTML = `
-    <div style="margin-bottom:8px;">¿Qué querés hacer ahora?</div>
-    <div class="options-container">
-      <button class="option-btn" id="sed-nuevo-diag">🔄 Nuevo diagnóstico</button>
-      <button class="option-btn" id="sed-consulta-libre">📖 Consulta libre al manual</button>
-      <button class="option-btn" id="sed-volver-maquinas">← Volver a máquinas</button>
-    </div>
-  `;
-  document.getElementById('chat-window').appendChild(div);
-  document.getElementById('chat-window').scrollTop = 99999;
-
-  div.querySelector('#sed-nuevo-diag').addEventListener('click', () => {
-    div.remove(); iniciarSEDinamico(nombreMaquina);
-  });
-  div.querySelector('#sed-consulta-libre').addEventListener('click', () => {
-    div.remove();
-    sessionState.modo = 'rag';
-    iniciarModoRAG(nombreMaquina);
-  });
-  div.querySelector('#sed-volver-maquinas').addEventListener('click', () => {
-    div.remove(); orbitReiniciar();
-  });
-}
+// ══ SE DINÁMICO ELIMINADO (2026-05-28) ══
+// Las máquinas sin árbol de conocimiento ahora usan consulta libre RAG
+// directamente desde handleMachineSelection.
 
 /**
  * Genera el HTML del badge de confianza según el score (0-100).
@@ -1338,17 +1267,19 @@ async function handleMachineSelection(machine) {
     const cats = data.categorias || [];
 
     if (cats.length > 0) {
-      // ── Máquina con árbol SE estático ─────────────────────────────────
+      // ── Máquina con árbol de conocimiento → SOLO sistema experto ──────
+      // La consulta libre queda reservada para manuales nuevos sin árbol.
+      // Al llegar a una solución, el botón "Profundizar con IA" la amplía.
       addMessage(`Elegiste <strong>${machine}</strong>. Seleccioná una categoría de diagnóstico:`);
       addOptions(cats, handleCategorySelection);
-      mostrarBotonRAG(machine);
     } else {
-      // ── Sin árbol estático → SE Dinámico respaldado por RAG ───────────
+      // ── Manual sin árbol (cargado por un técnico) → consulta libre RAG ─
       addMessage(`
-        <strong>${machine}</strong> — usando diagnóstico inteligente basado en el manual.
-        <br><span style="font-size:.8rem;color:rgba(26,24,24,.45);">Este diagnóstico se genera en tiempo real consultando el manual indexado.</span>
+        <strong>${machine}</strong> — consulta libre sobre el manual.
+        <br><span style="font-size:.8rem;color:rgba(26,24,24,.45);">Escribí tu pregunta y te respondo según el manual indexado.</span>
       `);
-      await iniciarSEDinamico(machine);
+      await _iniciarSesionRAG(machine);
+      await mostrarInputRAG(machine);
     }
 
   } catch (error) {
@@ -1370,6 +1301,9 @@ async function handleCategorySelection(category) {
     
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || "Error al iniciar diagnóstico.");
+
+    // Guardar el session_id aislado que devuelve el backend para reenviarlo en /avanzar
+    if (data.session_id) sessionState.se_session_id = data.session_id;
 
     handleApiResponse(data);
 
@@ -1394,7 +1328,7 @@ async function handleOptionSelection(respuesta) {
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ respuesta: respuesta }),
+        body: JSON.stringify({ respuesta: respuesta, session_id: sessionState.se_session_id }),
       }
     );
 

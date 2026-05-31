@@ -4,19 +4,54 @@ from fastapi import APIRouter, HTTPException, Body, Header, UploadFile, File, Fo
 from typing import Optional
 import os
 import json
+import time
+import uuid
+import threading
 from pathlib import Path
 from api.auth import validar_usuario, crear_token, validar_token, eliminar_token
 from api.base_conocimiento import BaseConocimiento
 from api.engine import MotorInferencia
 from api.stats import stats_manager
 from api.rag.cache import registrar_feedback, stats_cache
-from api.rag.se_dinamico import iniciar_diagnostico as se_iniciar_diagnostico, siguiente_paso as se_siguiente_paso
 
 router = APIRouter(prefix="/api", tags=["Sistema Experto"])
 
 base = BaseConocimiento()
 motor_global = MotorInferencia(base)
+
+# ── Sesiones del SE estático ──────────────────────────────────────────────────
+# Cada entrada: key -> {"motor": MotorInferencia, "ts": float}.
+# Antes era un dict global sin lock ni expiración: crecía sin límite (leak) y no
+# era thread-safe. Ahora se protege con lock y expira por inactividad.
+# NOTA: la key sigue siendo "maquina|categoria", así que dos técnicos
+# diagnosticando la MISMA máquina+categoría a la vez todavía comparten motor.
+# La aislación por usuario real requiere un session_id enviado por el frontend
+# (pendiente, se integrará con el refactor de UX).
 sesiones = {}
+_sesiones_lock = threading.Lock()
+SESION_SE_TTL = 1800  # 30 minutos de inactividad
+
+
+def _guardar_sesion(key: str, motor: "MotorInferencia"):
+    ahora = time.time()
+    with _sesiones_lock:
+        sesiones[key] = {"motor": motor, "ts": ahora}
+        # Limpieza oportunista de sesiones expiradas
+        expiradas = [k for k, v in sesiones.items() if ahora - v["ts"] > SESION_SE_TTL]
+        for k in expiradas:
+            del sesiones[k]
+
+
+def _obtener_sesion(key: str):
+    with _sesiones_lock:
+        entry = sesiones.get(key)
+        if not entry:
+            return None
+        if time.time() - entry["ts"] > SESION_SE_TTL:
+            del sesiones[key]
+            return None
+        entry["ts"] = time.time()
+        return entry["motor"]
 
 # Mapeo fijo de nombres de manuales a claves de base de conocimiento
 MAPEO_NOMBRES_FIJO = {
@@ -197,9 +232,10 @@ def iniciar_diagnostico(nombre_maquina: str, categoria: str):
         # !! ESTE ES EL PASO CRÍTICO QUE FALTABA !!
         resultado = motor.seleccionar_categoria(categoria) 
 
-        # Guardamos la sesión por máquina + categoría (usar nombre técnico)
-        key = f"{nombre_tecnico}|{categoria}"
-        sesiones[key] = motor
+        # Sesión aislada por usuario: una key única por cada inicio de diagnóstico.
+        # Antes la key era "maquina|categoria", compartida entre todos los técnicos.
+        session_id = uuid.uuid4().hex
+        _guardar_sesion(session_id, motor)
 
         # Registrar estadística (usar nombre técnico)
         stats_manager.registrar_diagnostico_iniciado(nombre_tecnico, categoria)
@@ -209,7 +245,10 @@ def iniciar_diagnostico(nombre_maquina: str, categoria: str):
         if "falla" in resultado and "soluciones" in resultado:
             stats_manager.registrar_diagnostico_completado(nombre_tecnico, categoria, resultado["falla"])
 
-        # Retornamos el resultado del Paso 2
+        # Retornamos el resultado del Paso 2 con el session_id para que el
+        # frontend lo reenvíe en cada /avanzar.
+        if isinstance(resultado, dict):
+            resultado["session_id"] = session_id
         return resultado
 
     except Exception as e:
@@ -217,7 +256,7 @@ def iniciar_diagnostico(nombre_maquina: str, categoria: str):
 
 
 @router.post("/diagnosticar/avanzar/{nombre_maquina}/{categoria}")
-def avanzar_diagnostico(nombre_maquina: str, categoria: str, respuesta: str = Body(..., embed=True)):
+def avanzar_diagnostico(nombre_maquina: str, categoria: str, respuesta: str = Body(..., embed=True), session_id: Optional[str] = Body(None, embed=True)):
     """
     Avanza un paso en el árbol de diagnóstico según la respuesta del usuario.
     Devuelve la siguiente pregunta u opciones, o la falla y soluciones si se llegó a un nodo hoja.
@@ -225,8 +264,10 @@ def avanzar_diagnostico(nombre_maquina: str, categoria: str, respuesta: str = Bo
     # Normalizar nombre de máquina
     nombre_tecnico = normalizar_nombre_maquina(nombre_maquina)
     
-    key = f"{nombre_tecnico}|{categoria}"
-    motor = sesiones.get(key)
+    # Preferir el session_id del frontend (aislado por usuario); si no llega,
+    # usar la key vieja como fallback compatible.
+    key = session_id or f"{nombre_tecnico}|{categoria}"
+    motor = _obtener_sesion(key)
 
     if motor is None:
         raise HTTPException(status_code=404, detail="No se encontró una sesión activa para esta máquina y categoría.")
@@ -617,56 +658,6 @@ def registrar_feedback_usuario(
     return {"success": ok, "tipo": "positivo" if positivo else "negativo"}
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  SE DINÁMICO — diagnóstico guiado por RAG para cualquier manual
-# ══════════════════════════════════════════════════════════════════════════════
-
-@router.get("/se-dinamico/iniciar/{nombre_maquina}")
-def se_dinamico_iniciar(
-    nombre_maquina: str,
-    authorization: Optional[str] = Header(None, alias="Authorization"),
-):
-    """
-    Inicia un diagnóstico dinámico para una máquina.
-    Retorna las categorías/síntomas iniciales.
-    """
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="No autorizado")
-    token = authorization.replace("Bearer ", "")
-    if not validar_token(token):
-        raise HTTPException(status_code=401, detail="Token inválido")
-
-    try:
-        resultado = se_iniciar_diagnostico(nombre_maquina)
-        return resultado
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.post("/se-dinamico/paso/{nombre_maquina}")
-def se_dinamico_paso(
-    nombre_maquina: str,
-    payload: dict = Body(...),
-    authorization: Optional[str] = Header(None, alias="Authorization"),
-):
-    """
-    Avanza un paso en el diagnóstico dinámico.
-    Body: {historial_se: [...], respuesta_usuario: "..."}
-    """
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="No autorizado")
-    token = authorization.replace("Bearer ", "")
-    if not validar_token(token):
-        raise HTTPException(status_code=401, detail="Token inválido")
-
-    historial_se     = payload.get("historial_se", [])
-    respuesta_usuario = payload.get("respuesta_usuario", "")
-
-    if not respuesta_usuario:
-        raise HTTPException(status_code=400, detail="Falta respuesta_usuario")
-
-    try:
-        resultado = se_siguiente_paso(nombre_maquina, historial_se, respuesta_usuario)
-        return resultado
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+# NOTA: El SE Dinámico (endpoints /se-dinamico/*) fue eliminado (2026-05-28).
+# Los manuales sin árbol de conocimiento ahora se atienden por consulta libre RAG.
+# El módulo api/rag/se_dinamico.py quedó sin uso y puede borrarse.

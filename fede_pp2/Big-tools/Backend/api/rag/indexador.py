@@ -1,5 +1,6 @@
 # Backend/api/rag/indexador.py
 
+import re
 import fitz  # pymupdf
 import ollama
 import time
@@ -9,7 +10,7 @@ from pathlib import Path
 # OCR deshabilitado hasta implementacion futura
 OCR_DISPONIBLE = False
 
-from . import normalizar_nombre_coleccion, get_cliente_chroma, detectar_idioma
+from . import normalizar_nombre_coleccion, get_cliente_chroma, detectar_idioma, LLM_MODEL, LLM_KEEP_ALIVE
 
 CHUNK_SIZE      = 200
 CHUNK_OVERLAP   = 30
@@ -62,171 +63,194 @@ def _obtener_seccion_para_pagina(pagina: int, secciones: list) -> str:
     return seccion_actual
 
 
-def _reformatear_filas_tabla(filas: list) -> list:
-    """
-    Si las filas contienen encabezados SINTOMA/CAUSA/ACCION, convierte cada
-    fila a texto natural para mejorar la calidad del embedding.
-    "EL COMPRESOR NO ARRANCA | Interruptor abierto | Cerrar el seccionador"
-    -> "Síntoma: EL COMPRESOR NO ARRANCA. Causa probable: Interruptor abierto. Acción correctiva: Cerrar el seccionador."
-    """
-    es_tabla_averias = any(
-        "|" in f and any(kw in f.lower() for kw in ["sintoma", "symptom", "causa", "fault"])
-        for f in filas
-    )
-    if not es_tabla_averias:
-        return filas
+# ══════════════════════════════════════════════════════════════════════════════
+#  EXTRACCION DE TABLAS — reconstruccion por columnas (validada con manuales reales)
+#
+#  Estrategia (reemplaza el heuristico ALL_CAPS anterior, que generaba falsos
+#  positivos del tipo "Sintoma: WS CONTROLLER"):
+#   1. Una pagina solo recibe etiquetado SINTOMA/CAUSA/ACCION si REALMENTE tiene
+#      esos encabezados (_es_pagina_averias). El resto va como lineas planas.
+#   2. Las columnas se detectan por el encabezado o por los 2 mayores gaps en X,
+#      lo que maneja correctamente el layout a varias columnas (antes se mezclaban
+#      las filas y se partian sintomas como "EL COMPRESOR NO ARRANCA").
+#   3. Un sintoma puede ocupar varias lineas (wrapping) y tener varias causas; se
+#      agrupa todo en un bloque por sintoma.
+# ══════════════════════════════════════════════════════════════════════════════
 
-    resultado = []
-    sintoma_actual = ""
+_SECCION_RE = re.compile(
+    r"^(secci[oó]n|gu[ií]a de|b[uú]squeda de averias|sintoma\b|s[ií]ntoma\b|"
+    r"\d+\.\d+|p[aá]gina|tabla\b|cuadro\b)", re.I)
 
-    for fila in filas:
-        partes = [p.strip() for p in fila.split("|")]
 
-        # Encabezado de columnas → saltar
-        if len(partes) >= 2 and any(kw in partes[0].lower() for kw in ["sintoma", "symptom", "fault"]):
+def _agrupar_en_lineas(words: list, tol: int = 4) -> list:
+    """Agrupa los words de fitz (x0,y0,x1,y1,texto,...) en lineas visuales por Y.
+    Devuelve una lista de lineas; cada linea es una lista de (x0, texto) ordenada por X."""
+    lineas: dict = {}
+    for w in words:
+        x0, y0, texto = w[0], w[1], str(w[4])
+        if not texto.strip():
+            continue
+        clave = round(y0 / tol) * tol
+        lineas.setdefault(clave, []).append((x0, texto))
+    salida = []
+    for y in sorted(lineas):
+        salida.append((y, sorted(lineas[y], key=lambda c: c[0])))
+    return salida
+
+
+def _es_pagina_averias(pagina) -> bool:
+    """True solo si la pagina tiene encabezados de tabla de averias (SINTOMA + CAUSA).
+    Esto evita etiquetar como 'Sintoma' a titulos de seccion o pantallas de config."""
+    t = pagina.get_text("text").upper()
+    tiene_sintoma = any(k in t for k in ("SINTOMA", "SÍNTOMA", "SYMPTOM"))
+    tiene_causa   = any(k in t for k in ("CAUSA", "CAUSE", "FAULT"))
+    return tiene_sintoma and tiene_causa
+
+
+def _detectar_columnas(lineas: list) -> list:
+    """Coordenadas X de inicio de cada columna. Prioriza el encabezado
+    SINTOMA/CAUSA/ACCION; si no esta, usa los 2 mayores gaps horizontales."""
+    for _y, celdas in lineas:
+        up = " ".join(t for _, t in celdas).upper()
+        if "SINTOMA" in up and "CAUSA" in up and ("ACCION" in up or "ACCIÓN" in up):
+            cols = []
+            for x, t in celdas:
+                tu = t.upper().rstrip(":")
+                if tu in ("SINTOMA", "SÍNTOMA", "CAUSA", "ACCION", "ACCIÓN"):
+                    if not cols or x - cols[-1] > 30:
+                        cols.append(x)
+            if len(cols) >= 2:
+                return cols
+    xs = sorted({round(x) for _y, celdas in lineas for x, _ in celdas})
+    if len(xs) < 3:
+        return xs or [0]
+    gaps = sorted(((xs[i + 1] - xs[i], xs[i + 1]) for i in range(len(xs) - 1)), reverse=True)[:2]
+    return sorted([xs[0]] + [g[1] for g in gaps])
+
+
+def _es_caps(s: str) -> bool:
+    letras = re.sub(r"[^A-Za-zÁÉÍÓÚÑáéíóúñ]", "", s)
+    return len(letras) >= 3 and s.upper() == s
+
+
+def _reconstruir_tabla_averias(lineas: list, col_starts: list) -> list:
+    """Reconstruye una tabla SINTOMA/CAUSA/ACCION emparejando cada causa con su
+    accion. Una causa nueva empieza cuando la 2da columna arranca en MAYUSCULA
+    (las lineas que la continuan arrancan en minuscula). Devuelve un bloque por
+    sintoma con TODAS sus parejas 'causa -> accion'."""
+    if len(col_starts) < 2:
+        return []
+    thresholds = [(col_starts[i] + col_starts[i + 1]) / 2 for i in range(len(col_starts) - 1)]
+
+    def columna_de(x):
+        for i, t in enumerate(thresholds):
+            if x < t:
+                return i
+        return len(thresholds)
+
+    # Empezar DESPUES del encabezado SINTOMA/CAUSA/ACCION (saltea la prosa de
+    # introduccion a 2 columnas). Si no hay encabezado (continuacion), procesa todo.
+    inicio = 0
+    for idx, (_y, celdas) in enumerate(lineas):
+        up = " ".join(t for _, t in celdas).upper()
+        if "SINTOMA" in up and "CAUSA" in up and ("ACCION" in up or "ACCIÓN" in up):
+            inicio = idx + 1
+            break
+
+    bloques = []
+    actual  = None
+    par     = None
+    prev_col1_vacia = True
+
+    for _y, celdas in lineas[inicio:]:
+        cols = [""] * len(col_starts)
+        for x, texto in celdas:
+            cols[columna_de(x)] = (cols[columna_de(x)] + " " + texto).strip()
+        c1 = cols[0]
+        c2 = cols[1] if len(cols) > 1 else ""
+        c3 = cols[2] if len(cols) > 2 else ""
+        linea_completa = " ".join(cols).strip()
+
+        if _SECCION_RE.match(linea_completa) or _SECCION_RE.match(c1):
             continue
 
-        # Fila sin pipes
-        if len(partes) == 1:
-            texto = partes[0].strip()
-            # Sintoma ALL_CAPS sin digitos → actualizar sintoma actual
-            if (texto.upper() == texto
-                    and len(texto.split()) >= 2
-                    and not any(c.isdigit() for c in texto)):
-                sintoma_actual = texto
-                # No agregar sola: se incorpora en las filas de causa/accion siguientes
-            else:
-                resultado.append(fila)
+        # Sintoma (col 1, mayusculas; puede ocupar varias lineas)
+        if _es_caps(c1) and (actual is None or prev_col1_vacia):
+            actual = {"sintoma": c1, "pares": []}
+            bloques.append(actual)
+            par = None
+        elif actual is not None and _es_caps(c1):
+            actual["sintoma"] += " " + c1
+        prev_col1_vacia = not c1.strip()
+
+        # Parejas causa -> accion
+        if actual is not None:
+            if c2 and c2[:1].isupper():
+                par = {"causa": c2, "accion": c3}
+                actual["pares"].append(par)
+            elif par is not None:
+                if c2:
+                    par["causa"]  += " " + c2
+                if c3:
+                    par["accion"] += " " + c3
+            elif c2 or c3:
+                par = {"causa": c2, "accion": c3}
+                actual["pares"].append(par)
+
+    salida = []
+    for b in bloques:
+        s = re.sub(r"\s+", " ", b["sintoma"]).strip()
+        if not s:
             continue
-
-        # Fila con pipes
-        col1 = partes[0].strip()
-        col2 = partes[1].strip() if len(partes) > 1 else ""
-        col3 = partes[2].strip() if len(partes) > 2 else ""
-
-        # Col1 es sintoma si es ALL_CAPS sin digitos
-        col1_es_sintoma = (col1.upper() == col1
-                           and len(col1.split()) >= 2
-                           and not any(c.isdigit() for c in col1))
-
-        if col1_es_sintoma:
-            sintoma_actual = col1
-            causa  = col2
-            accion = col3
+        items = []
+        for p in b["pares"]:
+            c = re.sub(r"\s+", " ", p["causa"]).strip()
+            a = re.sub(r"\s+", " ", p["accion"]).strip().lstrip("-").strip()
+            if c and a:
+                items.append(f"{c} → {a}")
+            elif c:
+                items.append(c)
+            elif a:
+                items.append(a)
+        if items:
+            cuerpo = " ".join(f"{i + 1}) {t}." for i, t in enumerate(items))
+            salida.append(f"Sintoma: {s}. Causas posibles y acciones: {cuerpo}")
         else:
-            causa  = col1
-            accion = col2
+            salida.append(f"Sintoma: {s}.")
+    return salida
 
-        if not sintoma_actual:
-            resultado.append(fila)
-            continue
 
-        partes_nat = [f"Sintoma: {sintoma_actual}"]
-        if causa:
-            partes_nat.append(f"Causa probable: {causa}")
-        if accion:
-            partes_nat.append(f"Accion correctiva: {accion}")
-        resultado.append(". ".join(partes_nat) + ".")
-
-    return resultado if resultado else filas
+def _lineas_planas(lineas: list) -> list:
+    """Para paginas tipo tabla que NO son de averias: cada linea como texto, sin
+    etiquetar sintomas. Evita falsos positivos tipo 'Sintoma: WS CONTROLLER'."""
+    salida = []
+    for _y, celdas in lineas:
+        texto = re.sub(r"\s+", " ", " ".join(t for _, t in celdas)).strip()
+        if len(texto.split()) >= 2:
+            salida.append(texto)
+    return salida
 
 
 def _filas_por_posicion(pagina) -> list:
-    """
-    Para paginas con tablas: agrupa lineas por coordenada Y.
-    Cada fila -> texto natural reconstruido desde columnas SINTOMA/CAUSA/ACCION.
-    Intenta find_tables() (PyMuPDF >= 1.23) primero, luego fallback Y-position.
-    """
+    """Extrae filas de una pagina con tabla.
+    - Tabla de averias (tiene SINTOMA + CAUSA) -> reconstruccion por columnas.
+    - Cualquier otra -> lineas planas sin etiquetar."""
     try:
-        tabs = pagina.find_tables()
-        if tabs.tables:
-            filas = []
-            for tabla in tabs.tables:
-                for fila in tabla.extract():
-                    celdas = [str(c).strip() if c else "" for c in fila]
-                    texto = " | ".join(c for c in celdas if c)
-                    if len(texto.split()) >= 2:
-                        filas.append(texto)
-            if filas:
-                return _reformatear_filas_tabla(filas)
-    except AttributeError:
-        pass
-
-    lineas = []
-    try:
-        data = pagina.get_text("dict")
-        for bloque in data.get("blocks", []):
-            if bloque.get("type") != 0:
-                continue
-            for linea in bloque.get("lines", []):
-                y_top  = linea["bbox"][1]
-                x_left = linea["bbox"][0]
-                texto  = " ".join(span["text"] for span in linea.get("spans", [])).strip()
-                if texto:
-                    lineas.append({"y": y_top, "x": x_left, "texto": texto})
+        words = pagina.get_text("words")
     except Exception:
         return []
-
+    if not words:
+        return []
+    lineas = _agrupar_en_lineas(words)
     if not lineas:
         return []
 
-    lineas.sort(key=lambda l: (round(l["y"] / 4) * 4, l["x"]))
-    grupos = []
-    grupo_actual = [lineas[0]]
-    for linea in lineas[1:]:
-        if abs(linea["y"] - grupo_actual[-1]["y"]) <= 4:
-            grupo_actual.append(linea)
-        else:
-            grupos.append(grupo_actual)
-            grupo_actual = [linea]
-    if grupo_actual:
-        grupos.append(grupo_actual)
-
-    resultado = []
-    for grupo in grupos:
-        grupo.sort(key=lambda l: l["x"])
-        texto_fila = " ".join(" | ".join(l["texto"] for l in grupo).split())
-        palabras = texto_fila.split()
-        es_caps_solo = (len(palabras) == 1
-                        and texto_fila.strip().upper() == texto_fila.strip()
-                        and texto_fila.strip().isalpha())
-        if len(palabras) >= 2 or es_caps_solo:
-            resultado.append(texto_fila)
-
-    # ── Merge fragmentos de sintoma partidos ────────────────────────────────────
-    # "EL COMPRESOR NO" + fila_causa_accion + "ARRANCA"
-    # → "EL COMPRESOR NO ARRANCA"
-    # Condiciones: fragmento ALL_CAPS sin digitos, con max 2 filas intermedias.
-    merged = []
-    caps_pendiente_idx = -1
-    rows_since_caps    = 0
-
-    for fila in resultado:
-        partes  = fila.split(" | ")
-        primera = partes[0].strip()
-        es_solo_caps = (len(partes) == 1
-                        and primera.upper() == primera
-                        and len(primera) > 1
-                        and primera not in ("SINTOMA", "SYMPTOM")
-                        and not any(c.isdigit() for c in primera))
-        if es_solo_caps:
-            if caps_pendiente_idx >= 0 and rows_since_caps <= 2:
-                merged[caps_pendiente_idx] = merged[caps_pendiente_idx] + " " + primera
-                caps_pendiente_idx = -1
-                rows_since_caps    = 0
-            else:
-                caps_pendiente_idx = len(merged)
-                rows_since_caps    = 0
-                merged.append(fila)
-        else:
-            merged.append(fila)
-            if caps_pendiente_idx >= 0:
-                rows_since_caps += 1
-                if rows_since_caps > 2:
-                    caps_pendiente_idx = -1
-                    rows_since_caps    = 0
-
-    return _reformatear_filas_tabla(merged)
+    if _es_pagina_averias(pagina):
+        col_starts = _detectar_columnas(lineas)
+        filas = _reconstruir_tabla_averias(lineas, col_starts)
+        if filas:
+            return filas
+    return _lineas_planas(lineas)
 
 
 def _tiene_tabla(pagina, bloques_raw: list) -> bool:
@@ -300,6 +324,19 @@ def chunkear_bloques(bloques: list, secciones: list) -> list:
         chunks.append({"texto": prefijo + " ".join(palabras), "pagina": pagina, "seccion": seccion})
 
     for bloque in bloques:
+        # Cada síntoma de tabla de averías va en su PROPIO chunk: así el embedding
+        # queda enfocado en ese síntoma y el retrieval lo encuentra. Antes el síntoma
+        # se mezclaba con texto vecino en un chunk de ~200 palabras y se "diluía"
+        # (por eso "el compresor no arranca" a veces no se encontraba).
+        if bloque["texto"].startswith("Sintoma:"):
+            if buffer_palabras:
+                _flush(buffer_palabras, buffer_pagina, buffer_seccion)
+                buffer_palabras = []
+            sec = _obtener_seccion_para_pagina(bloque["pagina"], secciones)
+            prefijo = f"[Seccion: {sec}]\n" if sec else ""
+            chunks.append({"texto": prefijo + bloque["texto"], "pagina": bloque["pagina"], "seccion": sec})
+            continue
+
         palabras_bloque = bloque["texto"].split()
         pagina_bloque   = bloque["pagina"]
         seccion_bloque  = _obtener_seccion_para_pagina(pagina_bloque, secciones)
@@ -352,6 +389,14 @@ def indexar_manual(nombre_maquina: str, ruta_pdf: str) -> dict:
     except Exception:
         pass
 
+    # Invalidar el caché semántico viejo: si el manual se reindexó, las respuestas
+    # cacheadas pueden estar obsoletas (antes el caché sobrevivía al reindex y
+    # seguía sirviendo respuestas viejas).
+    try:
+        cliente.delete_collection("cache__" + col_name)
+    except Exception:
+        pass
+
     coleccion = cliente.create_collection(name=col_name, metadata={"hnsw:space": "cosine"})
 
     _set_progreso(col_name, {**get_progreso(nombre_maquina), "mensaje": "Analizando estructura del PDF..."})
@@ -390,12 +435,13 @@ def indexar_manual(nombre_maquina: str, ruta_pdf: str) -> dict:
         if idioma == "en":
             try:
                 resp = ollama.generate(
-                    model="llama3.2:3b",
+                    model=LLM_MODEL,
                     prompt=(
-                        "Translate to Spanish. Keep numbers, units and model names. "
+                        "/no_think\nTranslate to Spanish. Keep numbers, units and model names. "
                         "Output only the translation:\n\n" + chunk["texto"][:600]
                     ),
                     stream=False,
+                    keep_alive=LLM_KEEP_ALIVE,
                     options={"num_predict": 250, "temperature": 0, "num_ctx": 1024},
                 )
                 traduccion = resp.get("response", "").strip()
@@ -443,11 +489,8 @@ def esta_indexado(nombre_maquina: str) -> bool:
         coleccion = get_cliente_chroma().get_collection(
             name=normalizar_nombre_coleccion(nombre_maquina)
         )
-        if coleccion.count() == 0:
-            return False
-        from .retriever import _embedding
-        emb = _embedding("test")
-        coleccion.query(query_embeddings=[emb], n_results=1)
-        return True
+        # count() es suficiente para saber si hay chunks. Antes se hacia ademas
+        # un embedding de prueba con Ollama en CADA request (lento e innecesario).
+        return coleccion.count() > 0
     except Exception:
         return False

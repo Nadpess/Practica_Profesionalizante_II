@@ -5,11 +5,15 @@ import ollama
 import json
 from pathlib import Path
 
-from . import normalizar_nombre_coleccion, get_cliente_chroma, detectar_idioma
+from . import normalizar_nombre_coleccion, get_cliente_chroma, detectar_idioma, LLM_MODEL, LLM_KEEP_ALIVE
 from .cache import buscar_en_cache, guardar_en_cache
 
 N_RESULTADOS       = 6
-N_RESULTADOS_FINAL = 8
+N_RESULTADOS_FINAL = 5   # fragmentos que se le pasan al LLM (menos = más rápido)
+
+# Prefijo opcional para desactivar el "razonamiento" de modelos que lo tienen
+# (ej. qwen3 → "/no_think\n"). Con modelos sin razonamiento (gemma3) va vacío.
+_NO_THINK = ""
 
 
 # ── Traducción de chunks en inglés ────────────────────────────────────────────
@@ -132,27 +136,29 @@ def buscar_chunks(nombre_maquina: str, pregunta: str) -> list[dict]:
                     "score":   score,
                 }
 
-    # ── 2. Keyword fallback — frase completa, solo si la semántica es débil ────
-    mejor_score_semantico = min((v["score"] for v in vistos.values()), default=1.0)
-    if mejor_score_semantico > 0.35:
-        for variante in [pregunta, pregunta.upper(), pregunta.lower()]:
-            try:
-                kw = coleccion.get(
-                    where_document={"$contains": variante},
-                    include=["documents", "metadatas"],
-                    limit=4,
-                )
-                for doc, meta in zip(kw.get("documents", []), kw.get("metadatas", [])):
-                    if doc not in vistos:
-                        vistos[doc] = {
-                            "texto":   doc,
-                            "pagina":  meta["pagina"],
-                            "seccion": meta.get("seccion", ""),
-                            "idioma":  meta.get("idioma", ""),
-                            "score":   0.28,
-                        }
-            except Exception:
-                pass
+    # ── 2. Keyword fallback — frase exacta, SIEMPRE ───────────────────────────
+    # Antes solo corría si la semántica era débil; tras un reindex los scores
+    # fluctúan y un chunk con la frase exacta (ej. "EL COMPRESOR NO ARRANCA")
+    # se podía perder. Ahora siempre se busca la frase exacta y, si aparece,
+    # se incluye con buen score → se garantiza su recuperación.
+    for variante in [pregunta, pregunta.upper(), pregunta.lower()]:
+        try:
+            kw = coleccion.get(
+                where_document={"$contains": variante},
+                include=["documents", "metadatas"],
+                limit=4,
+            )
+            for doc, meta in zip(kw.get("documents", []), kw.get("metadatas", [])):
+                if doc not in vistos:
+                    vistos[doc] = {
+                        "texto":   doc,
+                        "pagina":  meta["pagina"],
+                        "seccion": meta.get("seccion", ""),
+                        "idioma":  meta.get("idioma", ""),
+                        "score":   0.28,
+                    }
+        except Exception:
+            pass
 
     chunks_ordenados = sorted(vistos.values(), key=lambda c: c["score"])
     return _preferir_espanol(chunks_ordenados[:N_RESULTADOS_FINAL * 2])[:N_RESULTADOS_FINAL]
@@ -163,8 +169,10 @@ def calcular_confianza(chunks: list[dict]) -> int:
         return 0
     mejores  = sorted(chunks, key=lambda c: c["score"])[:3]
     promedio = sum(c["score"] for c in mejores) / len(mejores)
-    MAX_DIST = 400
-    confianza = max(0, round((1 - promedio / MAX_DIST) * 100))
+    # Las colecciones de manuales usan distancia coseno (hnsw:space=cosine),
+    # cuyo rango es 0-2 (no L2). similitud = 1 - distancia → confianza en %.
+    # (Antes se usaba MAX_DIST=400, calibrado para L2, lo que daba ~100% siempre.)
+    confianza = max(0, round((1 - promedio) * 100))
     if len(chunks) < 3:
         confianza = round(confianza * 0.8)
     return min(confianza, 100)
@@ -202,7 +210,7 @@ def _construir_prompt(
             f"Sos el asistente técnico del Sistema Big Tools.\n"
             f"Analizá la falla usando ÚNICAMENTE los fragmentos del manual proporcionados.\n"
             f"Tu respuesta debe estar 100% en español. Si el manual está en inglés, TRADUCÍ cada parte.\n"
-            f"El que consulta ES el técnico en campo — nunca lo remitás a 'un técnico'.\n"
+            f"El que consulta ES el técnico en campo. NUNCA lo remitás a 'un técnico', 'servicio técnico', 'personal calificado/autorizado', 'soporte' ni similares: la solución la ejecuta él con el manual.\n"
             f"NUNCA inventes datos que no estén en los fragmentos.\n"
             f"Si la info no está en el manual: escribí exactamente 'Esta información no se encuentra en el manual indexado. Consultá al administrador para actualizar la base de datos.'\n\n"
             f"FORMATO OBLIGATORIO:\n"
@@ -229,14 +237,20 @@ def _construir_prompt(
         f"- No hagas preguntas de seguimiento. Con la info disponible, diagnosticá.\n"
         f"- El que consulta ES el técnico en campo — nunca lo remitás a 'un técnico' ni al 'servicio técnico'.\n"
         f"- NUNCA inventes pasos, valores ni procedimientos que no estén en los fragmentos.\n"
+        f"- Si el manual lista VARIAS causas posibles para el síntoma (tabla de averías), incluilas TODAS, cada una con su acción correctiva. NO te quedes con la primera.\n"
         f"- Si la solución está en el manual → respondé con el formato de abajo.\n"
         f"- Si no está → escribí exactamente: 'Esta información no se encuentra en el manual indexado. Consultá al administrador para actualizar la base de datos.'\n\n"
         f"FORMATO:\n"
-        f"Causa: [causa según el manual]\n"
-        f"Procedimiento:\n"
-        f"1. [paso concreto y ejecutable]\n"
-        f"2. [paso concreto y ejecutable]\n"
-        f"...\n"
+        f"- Si el manual da UNA sola causa:\n"
+        f"  Causa: [causa según el manual]\n"
+        f"  Procedimiento:\n"
+        f"  1. [paso concreto y ejecutable]\n"
+        f"  2. [paso concreto y ejecutable]\n"
+        f"- Si el manual lista VARIAS causas posibles para el síntoma (tabla de averías), enumeralas TODAS:\n"
+        f"  Posibles causas y acciones:\n"
+        f"  1. [causa] → [acción correctiva]\n"
+        f"  2. [causa] → [acción correctiva]\n"
+        f"  ...\n"
         f"Referencia: {archivo_pdf}, Pág. [N]\n\n"
         f"{hist_bloque}"
         f"FRAGMENTOS DEL MANUAL ({nombre_maquina}):\n{contexto}\n\n"
@@ -259,12 +273,28 @@ def generar_respuesta(nombre_maquina: str, pregunta: str, modo_analisis: bool = 
     prompt  = _construir_prompt(nombre_maquina, pregunta, chunks, modo_analisis)
     try:
         respuesta = ollama.chat(
-            model="llama3.2:3b",
-            messages=[{"role": "user", "content": prompt}],
+            model=LLM_MODEL,
+            messages=[{"role": "user", "content": _NO_THINK + prompt}],
+            keep_alive=LLM_KEEP_ALIVE,
         )
         return {"respuesta": respuesta["message"]["content"], "paginas": paginas}
     except Exception as e:
         raise ConnectionError(f"No se pudo conectar con Ollama: {e}")
+
+
+# ── Referencia de página (solo la del/los fragmento(s) más relevante(s)) ──────
+
+def _ref_paginas(chunks: list) -> str:
+    """Texto de referencia con la(s) página(s) del fragmento MÁS relevante, no de
+    todos los recuperados (evita listar páginas de ruido como '7, 11, 17, 45, 59')."""
+    if not chunks:
+        return ""
+    mejor = min(c.get("score", 1.0) for c in chunks)
+    pags  = sorted({c["pagina"] for c in chunks if c.get("score", 1.0) <= mejor + 0.08})
+    if not pags:
+        return ""
+    etq = "Pág. " if len(pags) == 1 else "Págs. "
+    return "\n\n📄 En el manual, revisá la " + etq + ", ".join(str(p) for p in pags) + "."
 
 
 # ── Respuesta con streaming (SSE) ─────────────────────────────────────────────
@@ -287,9 +317,10 @@ def generar_respuesta_stream(nombre_maquina: str, pregunta: str, modo_analisis: 
 
     try:
         for chunk in ollama.generate(
-            model="llama3.2:3b",
-            prompt=prompt,
+            model=LLM_MODEL,
+            prompt=_NO_THINK + prompt,
             stream=True,
+            keep_alive=LLM_KEEP_ALIVE,
             options={"num_predict": 400, "temperature": 0.1, "num_ctx": 4096}
         ):
             token = chunk.get("response", "")
@@ -297,6 +328,10 @@ def generar_respuesta_stream(nombre_maquina: str, pregunta: str, modo_analisis: 
                 yield f"data: {json.dumps({'tipo': 'token', 'texto': token})}\n\n"
     except Exception as e:
         yield f"data: {json.dumps({'tipo': 'error', 'mensaje': str(e)})}\n\n"
+
+    _ref = _ref_paginas(chunks)
+    if _ref:
+        yield f"data: {json.dumps({'tipo': 'token', 'texto': _ref})}\n\n"
 
     yield f"data: {json.dumps({'tipo': 'fin'})}\n\n"
 
@@ -335,14 +370,29 @@ def generar_respuesta_stream_conversacional(
         return
 
     prompt = _construir_prompt(nombre_maquina, pregunta, chunks, False, historial)
+
+    # Guardrail de preguntas de seguimiento (chat libre): si el asistente ya hizo
+    # >= 2 preguntas (mensajes que terminan en '?'), forzar diagnóstico directo.
+    n_preguntas = sum(
+        1 for m in historial
+        if m.get("role") == "assistant" and m.get("content", "").rstrip().endswith("?")
+    )
+    if n_preguntas >= 2:
+        prompt += (
+            "\n\nIMPORTANTE: Ya hiciste suficientes preguntas de aclaración. "
+            "NO hagas más preguntas. Con la información disponible, entregá ahora "
+            "un diagnóstico y un procedimiento concretos."
+        )
+
     yield f"data: {json.dumps({'tipo': 'inicio_stream'})}\n\n"
 
     respuesta_completa = []
     try:
         for chunk in ollama.generate(
-            model="llama3.2:3b",
-            prompt=prompt,
+            model=LLM_MODEL,
+            prompt=_NO_THINK + prompt,
             stream=True,
+            keep_alive=LLM_KEEP_ALIVE,
             options={"num_predict": 400, "temperature": 0.1, "num_ctx": 4096}
         ):
             token = chunk.get("response", "")
@@ -355,6 +405,10 @@ def generar_respuesta_stream_conversacional(
         return
 
     texto_final = "".join(respuesta_completa)
+    _ref = _ref_paginas(chunks)
+    if _ref:
+        yield f"data: {json.dumps({'tipo': 'token', 'texto': _ref})}\n\n"
+        texto_final += _ref
     yield f"data: {json.dumps({'tipo': 'respuesta_completa', 'texto': texto_final})}\n\n"
     yield f"data: {json.dumps({'tipo': 'fin'})}\n\n"
 

@@ -8,6 +8,14 @@ import chromadb
 from pathlib import Path
 from typing import Optional
 
+# ── Modelo LLM local (Ollama) ─────────────────────────────────────────────────
+# Punto ÚNICO para cambiar de modelo en todo el sistema (chat, análisis, traducción).
+# Para probar otro: `ollama pull <modelo>` y cambiar esta línea.
+LLM_MODEL = "qwen2.5:3b"  # 3B, SIN razonamiento, entra 100% en GPU de 4 GB (rápido)
+# Tiempo que Ollama mantiene el modelo cargado en memoria entre consultas
+# (evita la demora de recargarlo en cada pregunta).
+LLM_KEEP_ALIVE = "30m"
+
 # ── Detección de idioma (sin dependencias externas) ──────────────────────────
 # Palabras funcionales de alta frecuencia que distinguen español vs inglés.
 # Son suficientemente distintas entre idiomas para clasificar con buena precisión.
