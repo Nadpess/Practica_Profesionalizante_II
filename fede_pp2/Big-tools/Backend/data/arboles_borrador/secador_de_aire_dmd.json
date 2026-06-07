@@ -1,0 +1,34 @@
+{
+  "categorias": [
+    {
+      "categoria": "REPARACIÓN DE LA VÁLVULA DE LANZADERA",
+      "pregunta": "¿Cuál de estas causas corresponde? (verificá en el equipo)",
+      "ramas": [
+        {
+          "atributo": "Quite la tapa de la válvula utilizando una llave fija o inglesa.",
+          "falla": "Quite la tapa de la válvula utilizando una llave fija o inglesa.",
+          "soluciones": [
+            "Quite la tapa de la válvula utilizando una llave fija o inglesa."
+          ],
+          "referencia": "Secador_DMD_Sullair.pdf"
+        },
+        {
+          "atributo": "Sustituya las juntas tóricas de la tapa.",
+          "falla": "Sustituya las juntas tóricas de la tapa.",
+          "soluciones": [
+            "Sustituya las juntas tóricas de la tapa."
+          ],
+          "referencia": "Secador_DMD_Sullair.pdf"
+        },
+        {
+          "atributo": "Retire el colector con una llave Allen.",
+          "falla": "Retire el colector con una llave Allen.",
+          "soluciones": [
+            "Sustituya las juntas tóricas."
+          ],
+          "referencia": "Secador_DMD_Sullair.pdf"
+        }
+      ]
+    }
+  ]
+}

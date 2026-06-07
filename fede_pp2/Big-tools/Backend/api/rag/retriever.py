@@ -9,7 +9,7 @@ from . import normalizar_nombre_coleccion, get_cliente_chroma, detectar_idioma, 
 from .cache import buscar_en_cache, guardar_en_cache
 
 N_RESULTADOS       = 6
-N_RESULTADOS_FINAL = 5   # fragmentos que se le pasan al LLM (menos = más rápido)
+N_RESULTADOS_FINAL = 4   # fragmentos que se le pasan al LLM (menos = más rápido / menos contexto)
 
 # Prefijo opcional para desactivar el "razonamiento" de modelos que lo tienen
 # (ej. qwen3 → "/no_think\n"). Con modelos sin razonamiento (gemma3) va vacío.
@@ -186,6 +186,7 @@ def _construir_prompt(
     chunks: list,
     modo_analisis: bool = False,
     historial: list = None,
+    contexto_diag: str = "",
 ) -> str:
     def _fmt(c: dict) -> str:
         header = f"[Pág. {c['pagina']}]"
@@ -204,6 +205,13 @@ def _construir_prompt(
             lineas.append(f"{rol}: {msg['content']}")
         if lineas:
             hist_bloque = "CONVERSACIÓN PREVIA:\n" + "\n".join(lineas) + "\n\n"
+
+    ctx_diag_bloque = ""
+    if contexto_diag:
+        ctx_diag_bloque = (
+            "CONTEXTO DEL DIAGNÓSTICO PREVIO (el técnico ya pasó por el sistema experto; "
+            "respondé sus repreguntas teniendo esto en cuenta):\n" + contexto_diag + "\n\n"
+        )
 
     if modo_analisis:
         return (
@@ -224,6 +232,24 @@ def _construir_prompt(
             f"FRAGMENTOS DEL MANUAL ({nombre_maquina}):\n{contexto}\n\n"
             f"FALLA: {pregunta}\n\n"
             f"ANÁLISIS:"
+        )
+
+    # ── Rama CONVERSACIONAL: repreguntas tras el diagnóstico (formato libre) ──────
+    if contexto_diag:
+        return (
+            f"Sos el asistente técnico del Sistema Big Tools, conversando con un técnico en campo.\n"
+            f"El técnico YA pasó por el diagnóstico guiado y la ampliación; ahora te hace repreguntas sobre ese mismo equipo.\n\n"
+            f"DÓNDE ESTAMOS PARADOS (contexto del diagnóstico previo):\n{contexto_diag}\n\n"
+            f"REGLAS:\n"
+            f"- Respondé la consulta de forma DIRECTA, clara y conversacional, 100% en español. SIN formato rígido (nada de 'Causa:/Procedimiento:').\n"
+            f"- Apoyate en el contexto de arriba y en los fragmentos del manual. Si el manual está en inglés, traducí.\n"
+            f"- El que consulta ES el técnico en campo — nunca lo remitás a 'un técnico' ni al 'servicio técnico'.\n"
+            f"- NUNCA inventes datos que no estén en el contexto ni en los fragmentos.\n"
+            f"- Si la respuesta no figura en el manual, decilo claramente: 'Eso no figura en el manual indexado.'\n\n"
+            f"{hist_bloque}"
+            f"FRAGMENTOS DEL MANUAL ({nombre_maquina}):\n{contexto}\n\n"
+            f"CONSULTA DEL TÉCNICO: {pregunta}\n\n"
+            f"RESPUESTA:"
         )
 
     return (
@@ -252,6 +278,7 @@ def _construir_prompt(
         f"  2. [causa] → [acción correctiva]\n"
         f"  ...\n"
         f"Referencia: {archivo_pdf}, Pág. [N]\n\n"
+        f"{ctx_diag_bloque}"
         f"{hist_bloque}"
         f"FRAGMENTOS DEL MANUAL ({nombre_maquina}):\n{contexto}\n\n"
         f"CONSULTA: {pregunta}\n\n"
@@ -321,7 +348,7 @@ def generar_respuesta_stream(nombre_maquina: str, pregunta: str, modo_analisis: 
             prompt=_NO_THINK + prompt,
             stream=True,
             keep_alive=LLM_KEEP_ALIVE,
-            options={"num_predict": 400, "temperature": 0.1, "num_ctx": 4096}
+            options={"num_predict": 800, "temperature": 0.1, "num_ctx": 4096}
         ):
             token = chunk.get("response", "")
             if token:
@@ -336,15 +363,46 @@ def generar_respuesta_stream(nombre_maquina: str, pregunta: str, modo_analisis: 
     yield f"data: {json.dumps({'tipo': 'fin'})}\n\n"
 
 
+# ── Resumen rodante de la conversación (para no perder la ventana de contexto) ─
+
+def resumir_conversacion(contexto_diag: str, resumen_previo: str, mensajes: list) -> str:
+    """Comprime los turnos viejos en un resumen breve. Se llama de forma lazy
+    (solo cuando la charla se hizo larga). Si falla, devuelve el resumen previo."""
+    if not mensajes:
+        return resumen_previo
+    convo = "\n".join(
+        f"{'Técnico' if m.get('role') == 'user' else 'Asistente'}: {m.get('content', '')}"
+        for m in mensajes
+    )
+    prompt = (
+        "Resumí de forma breve y concreta esta conversación técnica (qué consultó el "
+        "técnico y qué se le respondió), para conservar el contexto sin todo el detalle. "
+        "Máximo 4-5 líneas.\n\n"
+        + (f"Resumen previo: {resumen_previo}\n\n" if resumen_previo else "")
+        + "Conversación:\n" + convo + "\n\nResumen breve:"
+    )
+    try:
+        resp = ollama.generate(
+            model=LLM_MODEL, prompt=_NO_THINK + prompt, stream=False, keep_alive=LLM_KEEP_ALIVE,
+            options={"temperature": 0, "num_ctx": 4096, "num_predict": 300},
+        )
+        return resp.get("response", "").strip() or resumen_previo
+    except Exception:
+        return resumen_previo
+
+
 # ── Stream conversacional (con memoria de sesión) ─────────────────────────────
 
 def generar_respuesta_stream_conversacional(
     nombre_maquina: str,
     pregunta: str,
     historial: list,
+    contexto_diag: str = "",
+    resumen: str = "",
 ):
     # ── 1. Cache semántico ────────────────────────────────────────────────────
-    es_primera_consulta = not any(m["role"] == "user" for m in historial)
+    # Sin caché cuando hay contexto de diagnóstico: la respuesta es específica de ese caso.
+    es_primera_consulta = (not contexto_diag) and not any(m["role"] == "user" for m in historial)
     if es_primera_consulta:
         hit = buscar_en_cache(nombre_maquina, pregunta)
         if hit:
@@ -369,20 +427,11 @@ def generar_respuesta_stream_conversacional(
         yield f"data: {json.dumps({'tipo': 'fin'})}\n\n"
         return
 
-    prompt = _construir_prompt(nombre_maquina, pregunta, chunks, False, historial)
-
-    # Guardrail de preguntas de seguimiento (chat libre): si el asistente ya hizo
-    # >= 2 preguntas (mensajes que terminan en '?'), forzar diagnóstico directo.
-    n_preguntas = sum(
-        1 for m in historial
-        if m.get("role") == "assistant" and m.get("content", "").rstrip().endswith("?")
-    )
-    if n_preguntas >= 2:
-        prompt += (
-            "\n\nIMPORTANTE: Ya hiciste suficientes preguntas de aclaración. "
-            "NO hagas más preguntas. Con la información disponible, entregá ahora "
-            "un diagnóstico y un procedimiento concretos."
-        )
+    # Ancla del diagnóstico + resumen rodante de los turnos viejos.
+    ctx = contexto_diag
+    if resumen:
+        ctx = (ctx + "\n\n" if ctx else "") + "Resumen de lo ya conversado: " + resumen
+    prompt = _construir_prompt(nombre_maquina, pregunta, chunks, False, historial, ctx)
 
     yield f"data: {json.dumps({'tipo': 'inicio_stream'})}\n\n"
 
@@ -393,7 +442,7 @@ def generar_respuesta_stream_conversacional(
             prompt=_NO_THINK + prompt,
             stream=True,
             keep_alive=LLM_KEEP_ALIVE,
-            options={"num_predict": 400, "temperature": 0.1, "num_ctx": 4096}
+            options={"num_predict": 800, "temperature": 0.1, "num_ctx": 4096}
         ):
             token = chunk.get("response", "")
             if token:

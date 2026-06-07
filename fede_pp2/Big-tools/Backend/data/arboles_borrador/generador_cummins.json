@@ -1,0 +1,252 @@
+{
+  "categorias": [
+    {
+      "categoria": "Nivel de refrigerante bajo",
+      "falla": "La entrada Nivel de refrigerante bajo está activada y la respuesta del umbral está ajustada a Parada. Dejar que el motor se enfríe completamente antes de proceder:",
+      "soluciones": [
+        "a) Buscar posibles puntos de pérdida de refrigerante y repararlos si es necesario. b) Comprobar el nivel de refrigerante y rellenar si está bajo. c) Reiniciar el control y volver a arrancar después de localizar y corregir el problema."
+      ],
+      "referencia": "Generador_Cummins.pdf"
+    },
+    {
+      "categoria": "Fallo en el arranque",
+      "falla": "Indica un posible fallo del control o del sistema de arranque. (El motor gira pero falla en el arranque). Dejar que el motor se enfríe completamente antes de proceder con las comprobaciones siguientes:",
+      "soluciones": [
+        "a) Comprobar si el depósito de combustible está vacío, si hay pérdidas de combustible o líneas de combustible bloqueadas, y corregir según sea necesario. b) Comprobar si el filtro de combustible está sucio, sustituir si es necesario. c) Comprobar si el filtro de aire está sucio o bloqueado y sustituirlo si es necesario. d) Limpiar y apretar todas las conexiones de cables de la batería e) Batería descargada o defectuosa. Recargar o sustituir f) Reiniciar el control y volver a arrancar después de corregir el problema"
+      ],
+      "referencia": "Generador_Cummins.pdf"
+    },
+    {
+      "categoria": "Presión canal de aceite baja",
+      "falla": "Indica que la presión de aceite del motor ha caído por debajo del punto de disparo de parada. Dejar que el motor se enfríe completamente antes de proceder con las comprobaciones siguientes:",
+      "soluciones": [
+        "a) Comprobar el nivel de aceite, las tuberías y los filtros. b) Si el sistema de aceite está OK pero el nivel de aceite es bajo, rellenar. c) Reiniciar el control y volver a arrancar después de localizar y corregir el problema."
+      ],
+      "referencia": "Generador_Cummins.pdf"
+    },
+    {
+      "categoria": "Comunicación entre el control del motor y el PCC degradada",
+      "falla": "La comunicación entre el control del motor (ECM) y el PCC está cortada. Dejar que el motor se enfríe completamente antes de proceder:",
+      "soluciones": [
+        "a) Asegurarse de que el botón de parada de emergencia no está activado. Reiniciar la parada de emergencia local/remota."
+      ],
+      "referencia": "Generador_Cummins.pdf"
+    },
+    {
+      "categoria": "Voltaje 1 batería bajo",
+      "falla": "Indica que el voltaje de la batería está por debajo de 24VDC y se está aproximando a un nivel bajo en el cual se producirá un funcionamiento impredecible Si el motor puede pararse, dejar que el motor se enfríe completamente antes de proceder:",
+      "soluciones": [
+        "a) Limpiar los terminales de la batería y apretar todas las conexiones b) Comprobar el nivel de electrolito, rellenar y recargar (si es aplicable) c) Batería descargada o defectuosa. Recargar o sustituir."
+      ],
+      "referencia": "Generador_Cummins.pdf"
+    },
+    {
+      "categoria": "Voltaje 1 batería alto",
+      "falla": "Indica que el voltaje de la batería al control se está aproximando a un nivel alto (super",
+      "soluciones": [],
+      "referencia": "Generador_Cummins.pdf"
+    },
+    {
+      "categoria": "Parada caliente del motor",
+      "falla": "Se ha pulsado el interruptor de emergencia o se ha pulsado el botón de parada antes de que el grupo generador complete la operación de enfriamiento",
+      "soluciones": [
+        "El grupo generador debe funcionar al 10% o menos de la carga durante tres minutos antes de la parada del motor; evitar esta parada caliente para prevenir daños en el motor"
+      ],
+      "referencia": "Generador_Cummins.pdf"
+    },
+    {
+      "categoria": "Fallo datos CAN Link",
+      "falla": "El botón de parada de emergencia está activado",
+      "soluciones": [
+        "Asegurarse de que el botón de parada de emergencia no está activado y reiniciar la parada de emergencia local/remota"
+      ],
+      "referencia": "Generador_Cummins.pdf"
+    },
+    {
+      "categoria": "Battle short activado",
+      "falla": "Se ha activado el modo Battle Short para derivar diversas paradas de fallo",
+      "soluciones": [
+        "Investigar cualquier código de fallo que se esté saltando"
+      ],
+      "referencia": "Generador_Cummins.pdf"
+    },
+    {
+      "categoria": "Entrada configurable #2, 13 y 14",
+      "falla": "La entrada configurada tiene un fallo",
+      "soluciones": [
+        "Comprobar los requisitos de la entrada # y corregir si es posible"
+      ],
+      "referencia": "Generador_Cummins.pdf"
+    },
+    {
+      "categoria": "Fallo de parada",
+      "falla": "Se ha saltado una parada mientras el grupo generador está en modo Battle Short",
+      "soluciones": [
+        "Localizar y solucionar el fallo de parada que está causando que se pare el grupo generador"
+      ],
+      "referencia": "Generador_Cummins.pdf"
+    },
+    {
+      "categoria": "Parada de emergencia local/Parada de emergencia remota",
+      "falla": "Se ha activado una parada de emergencia local o remota",
+      "soluciones": [
+        "Desactivar el botón de parada de emergencia, pulsarlo y luego reiniciar; asegurarse de que el botón está funcionando correctamente"
+      ],
+      "referencia": "Generador_Cummins.pdf"
+    },
+    {
+      "categoria": "El equipo no arranca",
+      "pregunta": "¿Cuál de estas causas corresponde? (verificá en el equipo)",
+      "ramas": [
+        {
+          "atributo": "El calentador de refrigerante del motor no funciona o no hay refrigerante circulando",
+          "falla": "El calentador de refrigerante del motor no funciona o no hay refrigerante circulando",
+          "soluciones": [
+            "Comprobar si el fusible está fundido o el cable del calentador desconectado y corregir según sea necesario"
+          ],
+          "referencia": "Generador_Cummins.pdf"
+        },
+        {
+          "atributo": "Buscar posibles fugas de refrigerante y repararlas según se requiera",
+          "falla": "Buscar posibles fugas de refrigerante y repararlas según se requiera",
+          "soluciones": [
+            "NADA"
+          ],
+          "referencia": "Generador_Cummins.pdf"
+        },
+        {
+          "atributo": "Comprobar si el nivel de refrigerante es bajo y rellenar si es necesario",
+          "falla": "Comprobar si el nivel de refrigerante es bajo y rellenar si es necesario",
+          "soluciones": [
+            "NADA"
+          ],
+          "referencia": "Generador_Cummins.pdf"
+        },
+        {
+          "atributo": "El suministro del depósito de combustible diario está funcionando bajo",
+          "falla": "El suministro del depósito de combustible diario está funcionando bajo",
+          "soluciones": [
+            "Buscar posibles fugas de combustible y repararlas según se requiera"
+          ],
+          "referencia": "Generador_Cummins.pdf"
+        },
+        {
+          "atributo": "Comprobar si el nivel de combustible es bajo y rellenar si es necesario",
+          "falla": "Comprobar si el nivel de combustible es bajo y rellenar si es necesario",
+          "soluciones": [
+            "NADA"
+          ],
+          "referencia": "Generador_Cummins.pdf"
+        },
+        {
+          "atributo": "Indica que el nivel de combustible está por debajo del ajuste del umbral de bajo nivel de combustible respecto al ajuste de tiempo",
+          "falla": "Indica que el nivel de combustible está por debajo del ajuste del umbral de bajo nivel de combustible respecto al ajuste de tiempo",
+          "soluciones": [
+            "Buscar posibles fugas de combustible y repararlas según se requiera"
+          ],
+          "referencia": "Generador_Cummins.pdf"
+        }
+      ]
+    },
+    {
+      "categoria": "El motor no arranca",
+      "pregunta": "¿Cuál de estas causas corresponde? (verificá en el equipo)",
+      "ramas": [
+        {
+          "atributo": "Indica un posible fallo del control, del sensor de velocidad o del sistema de arranque",
+          "falla": "Indica un posible fallo del control, del sensor de velocidad o del sistema de arranque",
+          "soluciones": [
+            "Ver código 441 para la acción correctora"
+          ],
+          "referencia": "Generador_Cummins.pdf"
+        },
+        {
+          "atributo": "Asegurarse de que el botón de parada de emergencia está desengranado",
+          "falla": "Asegurarse de que el botón de parada de emergencia está desengranado",
+          "soluciones": [
+            "NADA"
+          ],
+          "referencia": "Generador_Cummins.pdf"
+        },
+        {
+          "atributo": "Indica que durante el arranque, el voltaje de la batería está en, o por debajo del punto de disparo de advertencia de batería baja durante un período igual o mayor que al tiempo ajustado de batería baja",
+          "falla": "Indica que durante el arranque, el voltaje de la batería está en, o por debajo del punto de disparo de advertencia de batería baja durante un período igual o mayor que al tiempo ajustado de batería baja",
+          "soluciones": [
+            "Ver código 441"
+          ],
+          "referencia": "Generador_Cummins.pdf"
+        },
+        {
+          "atributo": "Durante el arranque, el voltaje de la batería ha caído por debajo del voltaje operativo del PCC, lo que reinicia el PCC. Después de tres reinicios consecutivos, se activará el código de evento/fallo 1443",
+          "falla": "Durante el arranque, el voltaje de la batería ha caído por debajo del voltaje operativo del PCC, lo que reinicia el PCC. Después de tres reinicios consecutivos, se activará el código de evento/fallo 1443",
+          "soluciones": [
+            "Ver código 441"
+          ],
+          "referencia": "Generador_Cummins.pdf"
+        },
+        {
+          "atributo": "Indica que la frecuencia del grupo generador ha caído por debajo del 90% del nominal durante aproximadamente diez segundos",
+          "falla": "Indica que la frecuencia del grupo generador ha caído por debajo del 90% del nominal durante aproximadamente diez segundos",
+          "soluciones": [
+            "Comprobar el suministro de combustible"
+          ],
+          "referencia": "Generador_Cummins.pdf"
+        },
+        {
+          "atributo": "Comprobar el suministro de la entrada de aire",
+          "falla": "Comprobar el suministro de la entrada de aire",
+          "soluciones": [
+            "NADA"
+          ],
+          "referencia": "Generador_Cummins.pdf"
+        },
+        {
+          "atributo": "Comprobar la carga y corregir cualquier sobrecarga",
+          "falla": "Comprobar la carga y corregir cualquier sobrecarga",
+          "soluciones": [
+            "NADA"
+          ],
+          "referencia": "Generador_Cummins.pdf"
+        }
+      ]
+    },
+    {
+      "categoria": "El equipo se detiene",
+      "falla": "Exceso de frecuencia",
+      "soluciones": [
+        "Dejar que el motor se enfríe completamente; comprobar el suministro de combustible; comprobar el suministro de la entrada de aire; corregir cualquier sobrecarga."
+      ],
+      "referencia": "Generador_Cummins.pdf"
+    },
+    {
+      "categoria": "El equipo emite una advertencia",
+      "pregunta": "¿Cuál de estas causas corresponde? (verificá en el equipo)",
+      "ramas": [
+        {
+          "atributo": "Agua en el combustible en niveles prealtaos",
+          "falla": "Agua en el combustible en niveles prealtaos",
+          "soluciones": [
+            "Dejar que el motor se enfríe completamente; comprobar el combustible en el depósito (local o remoto); drenar y rellenar si es necesario; tener en cuenta las cuestiones de seguridad."
+          ],
+          "referencia": "Generador_Cummins.pdf"
+        },
+        {
+          "atributo": "Nivel bajo de refrigerante en el segundo radiador",
+          "falla": "Nivel bajo de refrigerante en el segundo radiador",
+          "soluciones": [
+            "Dejar que el motor se enfríe completamente; buscar posibles puntos de pérdida de refrigerante y repararlos si es necesario; comprobar el nivel de refrigerante y rellenar si está bajo; reiniciar el control y volver a arrancar después de localizar y corregir el problema."
+          ],
+          "referencia": "Generador_Cummins.pdf"
+        },
+        {
+          "atributo": "Fallo en el sistema de arranque",
+          "falla": "Fallo en el sistema de arranque",
+          "soluciones": [
+            "Remitirse a los códigos de fallo 359 y 1438."
+          ],
+          "referencia": "Generador_Cummins.pdf"
+        }
+      ]
+    }
+  ]
+}

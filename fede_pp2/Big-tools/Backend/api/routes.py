@@ -13,6 +13,7 @@ from api.base_conocimiento import BaseConocimiento
 from api.engine import MotorInferencia
 from api.stats import stats_manager
 from api.rag.cache import registrar_feedback, stats_cache
+from api.rag.generador_arbol import generar_arbol_completo, get_progreso_arbol
 
 router = APIRouter(prefix="/api", tags=["Sistema Experto"])
 
@@ -180,12 +181,9 @@ def obtener_estadisticas(authorization: Optional[str] = Header(None, alias="Auth
 @router.get("/maquinas")
 def listar_maquinas():
     """Lista todas las máquinas disponibles, ordenadas por popularidad (consultas totales)."""
-    nombres_amigables = {
-        "hidrolavadora_karcher": "Hidrolavadora Kärcher",
-        "generador_generac": "Generador Generac Guardian",
-        "motor_cummins": "Motor Cummins",
-        "soldadora_miller_ranger": "Soldadora Miller Ranger 305D"
-    }
+    # Nombres amigables dinámicos (derivados de manuales.json), no hardcodeados,
+    # para que las máquinas nuevas se muestren con su nombre y no con la clave.
+    nombres_amigables = NOMBRES_AMIGABLES
 
     maquinas_tecnicas = base.listar_maquinas()
     estadisticas = stats_manager.obtener_estadisticas()
@@ -661,3 +659,83 @@ def registrar_feedback_usuario(
 # NOTA: El SE Dinámico (endpoints /se-dinamico/*) fue eliminado (2026-05-28).
 # Los manuales sin árbol de conocimiento ahora se atienden por consulta libre RAG.
 # El módulo api/rag/se_dinamico.py quedó sin uso y puede borrarse.
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  GENERACIÓN AUTOMÁTICA DE ÁRBOL (borrador) + APROBACIÓN (validación humana)
+# ══════════════════════════════════════════════════════════════════════════════
+
+def _check_admin(authorization: Optional[str]):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="No autorizado")
+    usuario = validar_token(authorization.replace("Bearer ", ""))
+    if not usuario or usuario.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Solo administradores")
+
+
+@router.post("/admin/arbol/generar/{nombre_maquina}")
+def admin_generar_arbol(
+    nombre_maquina: str,
+    authorization: Optional[str] = Header(None, alias="Authorization"),
+):
+    """Inicia la generación del árbol en SEGUNDO PLANO (página por página).
+    Seguí el avance con GET /admin/arbol/progreso/{nombre_maquina}."""
+    _check_admin(authorization)
+    with open(MANUALES_JSON, "r", encoding="utf-8") as f:
+        manuales = json.load(f)
+    manual = next((m for m in manuales if m["nombre"] == nombre_maquina), None)
+    if not manual:
+        raise HTTPException(status_code=404, detail="Manual no encontrado")
+    ruta = MANUALES_DIR / manual["archivo"]
+    if not ruta.exists():
+        raise HTTPException(status_code=404, detail="PDF no encontrado")
+    clave = normalizar_nombre_para_clave(nombre_maquina)
+    if get_progreso_arbol(clave).get("estado") == "procesando":
+        return {"iniciado": True, "ya_en_curso": True, "clave": clave}
+
+    def _run():
+        generar_arbol_completo(str(ruta), manual["archivo"], clave)
+
+    threading.Thread(target=_run, daemon=True).start()
+    return {"iniciado": True, "clave": clave}
+
+
+@router.get("/admin/arbol/progreso/{nombre_maquina}")
+def admin_arbol_progreso(
+    nombre_maquina: str,
+    authorization: Optional[str] = Header(None, alias="Authorization"),
+):
+    """Progreso de la generación del árbol (para la barra del admin)."""
+    _check_admin(authorization)
+    return get_progreso_arbol(normalizar_nombre_para_clave(nombre_maquina))
+
+
+@router.post("/admin/arbol/aprobar/{nombre_maquina}")
+def admin_aprobar_arbol(
+    nombre_maquina: str,
+    payload: dict = Body(...),
+    authorization: Optional[str] = Header(None, alias="Authorization"),
+):
+    """Guarda (valida) el árbol revisado en la base de conocimiento → pasa a SE activo."""
+    _check_admin(authorization)
+    categorias = payload.get("categorias")
+    if categorias is None or not isinstance(categorias, list):
+        raise HTTPException(status_code=400, detail="Falta 'categorias' (lista)")
+    clave = normalizar_nombre_para_clave(nombre_maquina)
+    try:
+        with open(BASE_CONOCIMIENTO_JSON, "r", encoding="utf-8") as f:
+            base_c = json.load(f)
+        base_c[clave] = {"categorias": categorias}
+        with open(BASE_CONOCIMIENTO_JSON, "w", encoding="utf-8") as f:
+            json.dump(base_c, f, ensure_ascii=False, indent=2)
+        global base, motor_global
+        base = BaseConocimiento()
+        motor_global = MotorInferencia(base)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al guardar: {e}")
+    return {
+        "success": True,
+        "clave": clave,
+        "n_categorias": len(categorias),
+        "mensaje": f"Árbol aprobado y activo para '{nombre_maquina}'.",
+    }

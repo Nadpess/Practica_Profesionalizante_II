@@ -1,23 +1,26 @@
 {
-  "total_diagnosticos": 215,
+  "total_diagnosticos": 234,
   "diagnosticos_por_maquina": {
-    "generador_generac": 48,
-    "motor_cummins": 55,
-    "soldadora_miller_ranger": 42,
-    "hidrolavadora_karcher": 60,
+    "generador_generac": 49,
+    "motor_cummins": 56,
+    "soldadora_miller_ranger": 43,
+    "hidrolavadora_karcher": 62,
     "prueba": 3,
     "diagnostico": 1,
     "compresor": 2,
     "manual_cummins_2": 2,
-    "compresor_de_prueba": 2
+    "compresor_de_prueba": 2,
+    "motosoldadora_ranger": 3,
+    "generador_cummins": 4,
+    "compresor_sullair": 7
   },
   "diagnosticos_por_categoria": {
-    "generador_generac|Problemas con luces LED o alarmas": 35,
+    "generador_generac|Problemas con luces LED o alarmas": 36,
     "motor_cummins|Problemas de sobrecalentamiento": 28,
     "soldadora_miller_ranger|Problemas con salida auxiliar (tomas de corriente)": 6,
     "generador_generac|Problemas de arranque del motor": 4,
     "motor_cummins|Problemas de arranque": 4,
-    "soldadora_miller_ranger|Sin salida de soldadura": 8,
+    "soldadora_miller_ranger|Sin salida de soldadura": 9,
     "hidrolavadora_karcher|Una luz parpadea": 15,
     "generador_generac|Otros problemas de funcionamiento": 9,
     "soldadora_miller_ranger|Sobrecalentamiento de la unidad": 11,
@@ -30,7 +33,7 @@
     "hidrolavadora_karcher|El aparato no funciona o no se pone en marcha": 14,
     "motor_cummins|Humo excesivo": 4,
     "soldadora_miller_ranger|Motor funciona irregular o se apaga": 4,
-    "motor_cummins|Presión de aceite anormal": 2,
+    "motor_cummins|Presión de aceite anormal": 3,
     "prueba|Problemas de Rendimiento": 2,
     "prueba|Problemas Mecánicos": 1,
     "diagnostico|Problemas Mecánicos": 1,
@@ -39,141 +42,22 @@
     "manual_cummins_2|Problemas de Rendimiento": 1,
     "compresor|Problemas Mecánicos": 1,
     "compresor_de_prueba|Problemas de Rendimiento": 1,
-    "compresor_de_prueba|Problemas Mecánicos": 1
+    "compresor_de_prueba|Problemas Mecánicos": 1,
+    "motosoldadora_ranger|Problemas de arranque o parada del motor": 1,
+    "generador_cummins|El equipo se detiene": 1,
+    "generador_cummins|El equipo emite una advertencia": 1,
+    "hidrolavadora_karcher|Luz indicadora del motor": 1,
+    "motosoldadora_ranger|Batería y Alternador": 1,
+    "motosoldadora_ranger|Potencia de soldadura y Arco eléctrico": 1,
+    "compresor_sullair|El compresor no arranca": 2,
+    "compresor_sullair|El compresor se apaga teniendo demanda de aire": 1,
+    "compresor_sullair|Consumo excesivo de fluido del compresor": 2,
+    "hidrolavadora_karcher|Luz indicadora de combustible": 1,
+    "generador_cummins|Fallo de parada": 1,
+    "compresor_sullair|Presencia de agua en los conductos de aire comprimido": 2,
+    "generador_cummins|Entrada configurable #2, 13 y 14": 1
   },
   "historial": [
-    {
-      "timestamp": "2025-11-09T18:57:51.070346",
-      "maquina": "soldadora_miller_ranger",
-      "categoria": "Sobrecalentamiento de la unidad",
-      "completado": true,
-      "falla": "Excediendo ciclo de trabajo"
-    },
-    {
-      "timestamp": "2025-11-09T18:58:02.586983",
-      "maquina": "hidrolavadora_karcher",
-      "categoria": "El aparato no funciona o no se pone en marcha",
-      "completado": true,
-      "falla": "No hay tensión de red"
-    },
-    {
-      "timestamp": "2025-11-09T18:58:08.186266",
-      "maquina": "hidrolavadora_karcher",
-      "categoria": "El aparato no funciona o no se pone en marcha",
-      "completado": true,
-      "falla": "No hay tensión de red"
-    },
-    {
-      "timestamp": "2025-11-09T19:00:00.163910",
-      "maquina": "motor_cummins",
-      "categoria": "Pérdida de potencia",
-      "completado": true,
-      "falla": "Filtro de combustible obstruido"
-    },
-    {
-      "timestamp": "2025-11-09T19:02:18.449775",
-      "maquina": "soldadora_miller_ranger",
-      "categoria": "Calidad de soldadura deficiente",
-      "completado": true,
-      "falla": "Corriente muy baja o velocidad muy rápida"
-    },
-    {
-      "timestamp": "2025-11-09T19:02:43.565915",
-      "maquina": "generador_generac",
-      "categoria": "Problemas de arranque del motor",
-      "completado": true,
-      "falla": "Bujía(s) defectuosa(s)"
-    },
-    {
-      "timestamp": "2025-11-09T19:12:17.920345",
-      "maquina": "hidrolavadora_karcher",
-      "categoria": "El aparato no funciona o no se pone en marcha",
-      "completado": true,
-      "falla": "No hay tensión de red"
-    },
-    {
-      "timestamp": "2025-11-09T19:12:41.068584",
-      "maquina": "generador_generac",
-      "categoria": "Problemas con luces LED o alarmas",
-      "completado": true,
-      "falla": "Problema con el cargador de batería"
-    },
-    {
-      "timestamp": "2025-11-09T19:12:53.672800",
-      "maquina": "soldadora_miller_ranger",
-      "categoria": "Sobrecalentamiento de la unidad",
-      "completado": true,
-      "falla": "Rejillas de ventilación obstruidas"
-    },
-    {
-      "timestamp": "2025-11-09T19:18:04.013567",
-      "maquina": "hidrolavadora_karcher",
-      "categoria": "El quemador no se enciende (el agua no calienta)",
-      "completado": true,
-      "falla": "Falta de agua (el dispositivo de seguridad lo impide)"
-    },
-    {
-      "timestamp": "2025-11-09T19:18:12.578107",
-      "maquina": "soldadora_miller_ranger",
-      "categoria": "Motor funciona irregular o se apaga",
-      "completado": true,
-      "falla": "Carburador desajustado"
-    },
-    {
-      "timestamp": "2025-11-10T21:17:55.184317",
-      "maquina": "soldadora_miller_ranger",
-      "categoria": "Calidad de soldadura deficiente",
-      "completado": true,
-      "falla": "Corriente muy alta o polaridad incorrecta"
-    },
-    {
-      "timestamp": "2025-11-10T21:39:30.244378",
-      "maquina": "soldadora_miller_ranger",
-      "categoria": "Sobrecalentamiento de la unidad",
-      "completado": true,
-      "falla": "Ventilador de enfriamiento defectuoso"
-    },
-    {
-      "timestamp": "2025-11-10T21:42:08.600573",
-      "maquina": "motor_cummins",
-      "categoria": "Problemas de sobrecalentamiento",
-      "completado": true,
-      "falla": "Ventilador o embrague de ventilador defectuoso"
-    },
-    {
-      "timestamp": "2025-11-10T22:26:32.153545",
-      "maquina": "motor_cummins",
-      "categoria": "Problemas de sobrecalentamiento",
-      "completado": true,
-      "falla": "Ventilador o embrague de ventilador defectuoso"
-    },
-    {
-      "timestamp": "2025-11-10T22:26:56.924945",
-      "maquina": "soldadora_miller_ranger",
-      "categoria": "Calidad de soldadura deficiente",
-      "completado": true,
-      "falla": "Corriente muy alta o polaridad incorrecta"
-    },
-    {
-      "timestamp": "2025-11-10T22:30:29.116037",
-      "maquina": "generador_generac",
-      "categoria": "Problemas con luces LED o alarmas",
-      "completado": false
-    },
-    {
-      "timestamp": "2025-11-10T22:35:14.811255",
-      "maquina": "soldadora_miller_ranger",
-      "categoria": "Calidad de soldadura deficiente",
-      "completado": true,
-      "falla": "Corriente muy baja o velocidad muy rápida"
-    },
-    {
-      "timestamp": "2025-11-11T22:50:05.492316",
-      "maquina": "soldadora_miller_ranger",
-      "categoria": "Sin salida de soldadura",
-      "completado": true,
-      "falla": "Protección por sobrecarga activada"
-    },
     {
       "timestamp": "2025-11-12T17:11:27.406331",
       "maquina": "hidrolavadora_karcher",
@@ -389,17 +273,152 @@
       "categoria": "El quemador no se enciende (el agua no calienta)",
       "completado": true,
       "falla": "El filtro de combustible está sucio"
+    },
+    {
+      "timestamp": "2026-05-31T17:43:10.051339",
+      "maquina": "soldadora_miller_ranger",
+      "categoria": "Sin salida de soldadura",
+      "completado": true,
+      "falla": "Cables de soldadura desconectados o dañados"
+    },
+    {
+      "timestamp": "2026-05-31T17:43:27.663446",
+      "maquina": "generador_generac",
+      "categoria": "Problemas con luces LED o alarmas",
+      "completado": true,
+      "falla": "Arranque fallido (posible problema de combustible)"
+    },
+    {
+      "timestamp": "2026-06-01T15:08:23.313609",
+      "maquina": "motor_cummins",
+      "categoria": "Presión de aceite anormal",
+      "completado": true,
+      "falla": "Nivel bajo de aceite o aceite incorrecto"
+    },
+    {
+      "timestamp": "2026-06-05T19:55:22.289218",
+      "maquina": "motosoldadora_ranger",
+      "categoria": "Problemas de arranque o parada del motor",
+      "completado": true,
+      "falla": "Batería baja, conexiones sueltas o motor de arranque defectuoso."
+    },
+    {
+      "timestamp": "2026-06-05T20:06:00.928218",
+      "maquina": "generador_cummins",
+      "categoria": "El equipo se detiene",
+      "completado": true,
+      "falla": "Exceso de frecuencia"
+    },
+    {
+      "timestamp": "2026-06-05T20:07:15.370192",
+      "maquina": "generador_cummins",
+      "categoria": "El equipo emite una advertencia",
+      "completado": true,
+      "falla": "Fallo en el sistema de arranque"
+    },
+    {
+      "timestamp": "2026-06-05T20:24:27.717389",
+      "maquina": "hidrolavadora_karcher",
+      "categoria": "Luz indicadora del motor",
+      "completado": true,
+      "falla": "Error del contactor."
+    },
+    {
+      "timestamp": "2026-06-06T19:27:42.857899",
+      "maquina": "motosoldadora_ranger",
+      "categoria": "Batería y Alternador",
+      "completado": true,
+      "falla": "Batería defectuosa o alternador interno fallando."
+    },
+    {
+      "timestamp": "2026-06-06T19:30:32.556684",
+      "maquina": "motosoldadora_ranger",
+      "categoria": "Potencia de soldadura y Arco eléctrico",
+      "completado": true,
+      "falla": "Modo incorrecto o caída excesiva de voltaje."
+    },
+    {
+      "timestamp": "2026-06-06T19:33:22.696184",
+      "maquina": "compresor_sullair",
+      "categoria": "El compresor no arranca",
+      "completado": true,
+      "falla": "Sobrecargas de los relés de arranque - motor desactivado."
+    },
+    {
+      "timestamp": "2026-06-06T19:39:54.452171",
+      "maquina": "compresor_sullair",
+      "categoria": "El compresor se apaga teniendo demanda de aire",
+      "completado": true,
+      "falla": "Válvula reguladora/piloto o de puesta en vacío defectuosa."
+    },
+    {
+      "timestamp": "2026-06-06T20:05:42.563854",
+      "maquina": "compresor_sullair",
+      "categoria": "Consumo excesivo de fluido del compresor",
+      "completado": true,
+      "falla": "Tuberías o cedazos de retorno obstruidos."
+    },
+    {
+      "timestamp": "2026-06-06T20:17:04.819975",
+      "maquina": "hidrolavadora_karcher",
+      "categoria": "Luz indicadora de combustible",
+      "completado": true,
+      "falla": "Depósito de combustible vacío."
+    },
+    {
+      "timestamp": "2026-06-06T20:21:16.778924",
+      "maquina": "generador_cummins",
+      "categoria": "Fallo de parada",
+      "completado": true,
+      "falla": "Se ha saltado una parada mientras el grupo generador está en modo Battle Short"
+    },
+    {
+      "timestamp": "2026-06-06T20:59:00.195756",
+      "maquina": "compresor_sullair",
+      "categoria": "Presencia de agua en los conductos de aire comprimido",
+      "completado": true,
+      "falla": "Formación natural de condensación de vapor de agua del enfriador y de la compresión."
+    },
+    {
+      "timestamp": "2026-06-06T21:14:38.563878",
+      "maquina": "compresor_sullair",
+      "categoria": "El compresor no arranca",
+      "completado": true,
+      "falla": "Interruptor general o seccionador abierto."
+    },
+    {
+      "timestamp": "2026-06-06T21:15:40.185584",
+      "maquina": "generador_cummins",
+      "categoria": "Entrada configurable #2, 13 y 14",
+      "completado": true,
+      "falla": "La entrada configurada tiene un fallo"
+    },
+    {
+      "timestamp": "2026-06-06T21:16:30.843429",
+      "maquina": "compresor_sullair",
+      "categoria": "Presencia de agua en los conductos de aire comprimido",
+      "completado": true,
+      "falla": "Formación natural de condensación de vapor de agua del enfriador y de la compresión."
+    },
+    {
+      "timestamp": "2026-06-06T21:35:21.002012",
+      "maquina": "compresor_sullair",
+      "categoria": "Consumo excesivo de fluido del compresor",
+      "completado": true,
+      "falla": "Tuberías o cedazos de retorno obstruidos."
     }
   ],
-  "total_consultas_rag": 101,
+  "total_consultas_rag": 126,
   "consultas_rag_por_maquina": {
     "Motor Cummins": 10,
     "manual_cummins_2": 27,
-    "compresor": 37,
-    "motosoldadora_ranger": 5,
+    "compresor": 40,
+    "motosoldadora_ranger": 11,
     "Soldadora Miller Ranger 305D": 13,
     "Hidrolavadora Kärcher": 5,
-    "hidrolavadora_karcher": 2,
-    "motor_cummins": 2
+    "hidrolavadora_karcher": 3,
+    "motor_cummins": 3,
+    "generador_cummins": 3,
+    "compresor_sullair": 11
   }
 }

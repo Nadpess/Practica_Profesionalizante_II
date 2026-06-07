@@ -1,0 +1,146 @@
+{
+  "categorias": [
+    {
+      "categoria": "El motor no efectúa giros de arranque",
+      "pregunta": "¿Cuál de estas causas corresponde? (verificá en el equipo)",
+      "ramas": [
+        {
+          "atributo": "Fusible quemado",
+          "falla": "Fusible quemado",
+          "soluciones": [
+            "Corrija la condición de cortocircuito sustituyendo el fusible de 7.5 A en el tablero de control del generador"
+          ],
+          "referencia": "Generador_Generac.pdf"
+        },
+        {
+          "atributo": "Cables de batería sueltos, corroídos o defectuosos",
+          "falla": "Cables de batería sueltos, corroídos o defectuosos",
+          "soluciones": [
+            "Apriete, limpie o sustituya como sea necesario"
+          ],
+          "referencia": "Generador_Generac.pdf"
+        },
+        {
+          "atributo": "Contacto del arrancador defectuoso",
+          "falla": "Contacto del arrancador defectuoso",
+          "soluciones": [
+            "Vea el núm. 2"
+          ],
+          "referencia": "Generador_Generac.pdf"
+        },
+        {
+          "atributo": "Batería agotada",
+          "falla": "Batería agotada",
+          "soluciones": [
+            "Cargue o sustituya la batería"
+          ],
+          "referencia": "Generador_Generac.pdf"
+        }
+      ]
+    },
+    {
+      "categoria": "El motor efectúa giros de arranque pero no arranca",
+      "pregunta": "¿Cuál de estas causas corresponde? (verificá en el equipo)",
+      "ramas": [
+        {
+          "atributo": "Sin combustible",
+          "falla": "Sin combustible",
+          "soluciones": [
+            "Cargo combustible/abra la válvula de combustible"
+          ],
+          "referencia": "Generador_Generac.pdf"
+        },
+        {
+          "atributo": "Solenoide de combustible (FS) defectuoso",
+          "falla": "Solenoide de combustible (FS) defectuoso",
+          "soluciones": [],
+          "referencia": "Generador_Generac.pdf"
+        },
+        {
+          "atributo": "Abra el cable núm. 14 de la tarjeta de control del motor",
+          "falla": "Abra el cable núm. 14 de la tarjeta de control del motor",
+          "soluciones": [
+            "Repare el cableado"
+          ],
+          "referencia": "Generador_Generac.pdf"
+        },
+        {
+          "atributo": "Bujía(s) defectuosa(s)",
+          "falla": "Bujía(s) defectuosa(s)",
+          "soluciones": [
+            "Limpie, ajuste la separación o sustituya la(s) bujía(s)"
+          ],
+          "referencia": "Generador_Generac.pdf"
+        },
+        {
+          "atributo": "Huelgo de válvulas fuera de ajuste",
+          "falla": "Huelgo de válvulas fuera de ajuste",
+          "soluciones": [
+            "Vuelva a ajustar el huelgo de válvulas"
+          ],
+          "referencia": "Generador_Generac.pdf"
+        }
+      ]
+    },
+    {
+      "categoria": "El motor arranca con dificultad y funciona en forma irregular",
+      "pregunta": "¿Cuál de estas causas corresponde? (verificá en el equipo)",
+      "ramas": [
+        {
+          "atributo": "Depurador de aire obstruido o dañado",
+          "falla": "Depurador de aire obstruido o dañado",
+          "soluciones": [
+            "Revise o sustituya el depurador de aire"
+          ],
+          "referencia": "Generador_Generac.pdf"
+        },
+        {
+          "atributo": "Bujía(s) defectuosa(s)",
+          "falla": "Bujía(s) defectuosa(s)",
+          "soluciones": [
+            "Limpie, ajuste la separación o sustituya la(s) bujía(s)"
+          ],
+          "referencia": "Generador_Generac.pdf"
+        },
+        {
+          "atributo": "Regulador de combustible no configurado",
+          "falla": "Regulador de combustible no configurado",
+          "soluciones": [
+            "Configure el regulador de combustible"
+          ],
+          "referencia": "Generador_Generac.pdf"
+        },
+        {
+          "atributo": "Presión de combustible incorrecta",
+          "falla": "Presión de combustible incorrecta",
+          "soluciones": [
+            "Confirme que la presión de combustible al regulador sea 19 a 22 mm de mercurio (10 a 12 in de columna de agua) para LP, y 7 a 13 mm de mercurio (3.5 a 7 in de columna de agua) para gas natural"
+          ],
+          "referencia": "Generador_Generac.pdf"
+        },
+        {
+          "atributo": "Selector de combustible en posición errónea",
+          "falla": "Selector de combustible en posición errónea",
+          "soluciones": [
+            "Mueva el selector a la posición correcta"
+          ],
+          "referencia": "Generador_Generac.pdf"
+        },
+        {
+          "atributo": "El cebador se mantiene cerrado",
+          "falla": "El cebador se mantiene cerrado",
+          "soluciones": [
+            "Verifique que la placa del cebador se mueva libremente"
+          ],
+          "referencia": "Generador_Generac.pdf"
+        }
+      ]
+    },
+    {
+      "categoria": "El generador está en OFF, pero el motor sigue funcionando",
+      "falla": "Botón defectuoso",
+      "soluciones": [],
+      "referencia": "Generador_Generac.pdf"
+    }
+  ]
+}

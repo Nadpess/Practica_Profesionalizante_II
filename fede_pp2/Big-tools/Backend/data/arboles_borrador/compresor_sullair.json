@@ -1,0 +1,388 @@
+{
+  "categorias": [
+    {
+      "categoria": "EL COMPRESOR NO ARRANCA",
+      "pregunta": "¿Cuál de estas causas corresponde? (verificá en el equipo)",
+      "ramas": [
+        {
+          "atributo": "El interruptor general está abierto",
+          "falla": "El interruptor general está abierto",
+          "soluciones": [
+            "Cerrar el seccionador"
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "El fusible del circuito está fundido",
+          "falla": "El fusible del circuito está fundido",
+          "soluciones": [
+            "Reemplazar el fusible"
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "El fusible del transformador de control está fundido",
+          "falla": "El fusible del transformador de control está fundido",
+          "soluciones": [
+            "Reemplazar el fusible"
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Sobrecargas de los relés de arranque motor desactivado",
+          "falla": "Sobrecargas de los relés de arranque motor desactivado",
+          "soluciones": [
+            "Volver a rearmar. Si el problema continúa, comprobar que los contactos del relé de arranque funcionan correctamente."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Tensión de alimentación insuficiente",
+          "falla": "Tensión de alimentación insuficiente",
+          "soluciones": [
+            "Comprobar la tensión. Si la tensión es demasiado baja, consultar con la compañía de electricidad."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        }
+      ]
+    },
+    {
+      "categoria": "EL COMPRESOR SE PARA EN DEMANDA DE AIRE",
+      "pregunta": "¿Cuál de estas causas corresponde? (verificá en el equipo)",
+      "ramas": [
+        {
+          "atributo": "Pérdida de tensión en mando",
+          "falla": "Pérdida de tensión en mando",
+          "soluciones": [
+            "Consultar con la compañía de electricidad"
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Tensión alimentación insuficiente",
+          "falla": "Tensión alimentación insuficiente",
+          "soluciones": [],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Presión excesiva de servicio",
+          "falla": "Presión excesiva de servicio",
+          "soluciones": [
+            "Ajustar de nuevo. Si el problema persiste, comprobar que la presión del circuito no sobrepasa la presión máxima de servicio del compresor (indicada en la placa de identificación). Falla del switch de presión del circuito. Comprobar la presión a la que se abren los contactos."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Mantenimiento tanque separador",
+          "falla": "Mantenimiento tanque separador",
+          "soluciones": [
+            "Efectuar el debido mantenimiento en el tanque separador. Comprobar el indicador de presión en las condiciones de pleno régimen."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Switch de alta presión defectuoso",
+          "falla": "Switch de alta presión defectuoso",
+          "soluciones": [
+            "Reemplazarlo"
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Válvula defectuosa",
+          "falla": "Válvula defectuosa",
+          "soluciones": [
+            "La válvula reguladora puede provocar el cierre de la válvula de admisión cuando los contactos del switch de presión se abren. Reparar si hay una falla. 59"
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Válvula puesta en vacío defectuosa",
+          "falla": "Válvula puesta en vacío defectuosa",
+          "soluciones": [
+            "La válvula de puesta en vacío debe liberar la presión del separador hasta 1.2 bares (18psig cuando se alcanza la presión máxima de servicio). Reparar si hay una falla."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Restricción del caudal de aire refrigeración.",
+          "falla": "Restricción del caudal de aire refrigeración.",
+          "soluciones": [
+            "de Limpiar el enfriador y comprobar la correcta verificación."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Temperatura ambiental demasiado alta.",
+          "falla": "Temperatura ambiental demasiado alta.",
+          "soluciones": [
+            "Asegurar un nivel de ventilación suficiente."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Nivel de fluido demasiado bajo",
+          "falla": "Nivel de fluido demasiado bajo",
+          "soluciones": [
+            "Añadir fluido"
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Filtro obstruido",
+          "falla": "Filtro obstruido",
+          "soluciones": [
+            "Reemplazar el elemento del filtro del fluido."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Mal funcionamiento de la válvula termostática.",
+          "falla": "Mal funcionamiento de la válvula termostática.",
+          "soluciones": [
+            "Reemplazar el elemento."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Válvula de regulación del caudal agua defectuosa.",
+          "falla": "Válvula de regulación del caudal agua defectuosa.",
+          "soluciones": [
+            "de Reemplazar (refrigeración por agua solamente)."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Sonda termostática de descarga defectuosa",
+          "falla": "Sonda termostática de descarga defectuosa",
+          "soluciones": [
+            "Comprobar que no haya circuitos abiertos hacia la sonda (comprobar el cableado)"
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        }
+      ]
+    },
+    {
+      "categoria": "EL COMPRESOR SE PARA NO SUMINISTRA TODA PRESION DE DESCARGA",
+      "pregunta": "¿Cuál de estas causas corresponde? (verificá en el equipo)",
+      "ramas": [
+        {
+          "atributo": "Demanda de aire mayor",
+          "falla": "Demanda de aire mayor",
+          "soluciones": [
+            "a la Comprobar la presencia de fugas y de válvulas"
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "LA entregada",
+          "falla": "LA entregada",
+          "soluciones": [
+            "abiertas en el circuito de servicio."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Filtro de admisión sucio",
+          "falla": "Filtro de admisión sucio",
+          "soluciones": [
+            "Comprobar el indicador del filtro y reemplazar si es necesario."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Regulador de presión desajustado",
+          "falla": "Regulador de presión desajustado",
+          "soluciones": [
+            "Ajustar el regulador según las instrucciones de ajuste en el capítulo Mantenimiento."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Regulador de presión defectuoso",
+          "falla": "Regulador de presión defectuoso",
+          "soluciones": [
+            "Comprobar el diafragma y reemplazar si es necesario (kit disponible)."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Válvula de purga obstruida",
+          "falla": "Válvula de purga obstruida",
+          "soluciones": [
+            "Limpiarla o reemplazarla si es necesario."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Válvula solenoide defectuosa",
+          "falla": "Válvula solenoide defectuosa",
+          "soluciones": [
+            "Compruebe que la válvula se cierra cuando se energiza. Reemplazar la bobina o la válvula completa si continúa el inconveniente o fuese necesario."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Elemento de acoplamiento",
+          "falla": "Elemento de acoplamiento",
+          "soluciones": [
+            "Verificar el correcto estado del acople"
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        }
+      ]
+    },
+    {
+      "categoria": "PRESENCIA DE AGUA LA LINEA DE AIRE",
+      "pregunta": "¿Cuál de estas causas corresponde? (verificá en el equipo)",
+      "ramas": [
+        {
+          "atributo": "EN Línea de drenaje obstruida",
+          "falla": "EN Línea de drenaje obstruida",
+          "soluciones": [
+            "Limpiar el filtro o reemplazarlo si fuese necesario."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Válvula solenoide sucia / obstruida",
+          "falla": "Válvula solenoide sucia / obstruida",
+          "soluciones": [
+            "Comprobar que la válvula abre y cierra según la indicación del WS Controller"
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Temporizado de drenaje",
+          "falla": "Temporizado de drenaje",
+          "soluciones": [
+            "Comprobar que el tiempo de drenaje sea adecuado para la locación del equipo. En lugares muy húmedos se debe prever tiempos de drenaje más largos y más frecuentes."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        }
+      ]
+    },
+    {
+      "categoria": "LA PRESION DEL CIRCUITO SOBREPASA LA PRESION DE PARADA",
+      "pregunta": "¿Cuál de estas causas corresponde? (verificá en el equipo)",
+      "ramas": [
+        {
+          "atributo": "Fuga en el sistema de regulación que origina una pérdida de señales de presión.",
+          "falla": "Fuga en el sistema de regulación que origina una pérdida de señales de presión.",
+          "soluciones": [
+            "Comprobar que no haya fugas las"
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Electroválvula defectuosa",
+          "falla": "Electroválvula defectuosa",
+          "soluciones": [
+            "Comprobar que el diafragma y los contactos no estén deteriorados. Reemplazar si es necesario."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Válvula reguladora defectuosa",
+          "falla": "Válvula reguladora defectuosa",
+          "soluciones": [
+            "Comprobar que sale aire desde el orificio de control cuando los contactos del switch de presión se abren."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Filtro línea de control obstruido",
+          "falla": "Filtro línea de control obstruido",
+          "soluciones": [
+            "Reparar o reemplazar si es necesario (kit disponible) Limpiar el filtro (kit de reemplazo filtro / o’ring disponible)"
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Válvula de puesta en defectuosa",
+          "falla": "Válvula de puesta en defectuosa",
+          "soluciones": [
+            "vacío Comprobar que la presión del tanque se libera hacia la atmósfera cuando los contactos del switch de presión se abren. Reparar o reemplazar si es necesario (kit disponible)."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        }
+      ]
+    },
+    {
+      "categoria": "CONSUMO EXCESIVO FLUIDO",
+      "pregunta": "¿Cuál de estas causas corresponde? (verificá en el equipo)",
+      "ramas": [
+        {
+          "atributo": "DE Fluido del circuito de retorno orificio obstruido.",
+          "falla": "DE Fluido del circuito de retorno orificio obstruido.",
+          "soluciones": [
+            "u Limpiar el filtro (kit de reemplazo de filtro y del o’ring disponible). Limpiar el orificio."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Elemento del separador dañado defectuoso",
+          "falla": "Elemento del separador dañado defectuoso",
+          "soluciones": [
+            "o Cambiar el elemento separador."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Fuga en el circuito de lubricación",
+          "falla": "Fuga en el circuito de lubricación",
+          "soluciones": [
+            "Comprobar todos los conductos, las conexiones y los componentes."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "El fluido forma demasiada espuma",
+          "falla": "El fluido forma demasiada espuma",
+          "soluciones": [
+            "Vaciar y cambiar"
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Nivel de fluido demasiado alto",
+          "falla": "Nivel de fluido demasiado alto",
+          "soluciones": [
+            "Vaciar y cambiar."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        }
+      ]
+    },
+    {
+      "categoria": "LA VALVULA DE SEGURI- DAD SE ABRE DE MANERA REPETITIVA PRESENCIA DE AGUA LOS CONDUCTOS DE AIRE COMPRIMIDO",
+      "pregunta": "¿Cuál de estas causas corresponde? (verificá en el equipo)",
+      "ramas": [
+        {
+          "atributo": "Válvula de seguridad defectuosa",
+          "falla": "Válvula de seguridad defectuosa",
+          "soluciones": [
+            "Reemplazar la válvula de seguridad."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "Separador obstruido",
+          "falla": "Separador obstruido",
+          "soluciones": [
+            "Comprobar el tanque separador."
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        },
+        {
+          "atributo": "EN Formación natural de condensación de vapor de agua del enfriador la compresión.",
+          "falla": "EN Formación natural de condensación de vapor de agua del enfriador la compresión.",
+          "soluciones": [
+            "Evacuar el vapor de agua del aire comprimido y de antes de asegurar la distribución en el circuito de aire. Comprobar el funcionamiento del enfriador secundario y el separador de humedad. Montar un secador de aire comprimido de las dimensiones adecuadas para el caudal y el nivel de vapor seco (Nota: los filtros pueden servir también para eliminar las partículas, la pulverización de aceite líquido o el vapor de aceite. Reemplazar los elementos filtrantes según las recomendaciones del fabricante de filtros). Comprobar todos los drenajes regularmente asegurando su funcionamiento correcto. Asegurar un mantenimiento regular. 61"
+          ],
+          "referencia": "Compresor_Sullair.pdf"
+        }
+      ]
+    }
+  ]
+}

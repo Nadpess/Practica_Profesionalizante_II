@@ -335,7 +335,7 @@
             "soluciones": [
               "Cargar batería, limpiar terminales. Si persiste, acudir a servicio de motores."
             ],
-            "referencia": "Motosoldadora_Ranger.pdf"
+            "referencia": "Motosoldadora Ranger.pdf"
           },
           {
             "atributo": "El motor da marcha pero no arranca, o se apaga inmediatamente",
@@ -347,7 +347,7 @@
                 "soluciones": [
                   "Abrir válvula del filtro (vertical). Reemplazar filtros de combustible. Purgar sistema."
                 ],
-                "referencia": "Motosoldadora_Ranger.pdf"
+                "referencia": "Motosoldadora Ranger.pdf"
               },
               {
                 "atributo": "Luces de alta temperatura o baja presión de aceite encendidas",
@@ -355,7 +355,7 @@
                 "soluciones": [
                   "Revisar niveles de aceite y refrigerante. Comprobar correa del ventilador. Buscar fugas."
                 ],
-                "referencia": "Motosoldadora_Ranger.pdf"
+                "referencia": "Motosoldadora Ranger.pdf"
               },
               {
                 "atributo": "Falla eléctrica del solenoide de apagado",
@@ -363,7 +363,7 @@
                 "soluciones": [
                   "Verificar que el solenoide no esté trabado y que haya flujo de combustible."
                 ],
-                "referencia": "Motosoldadora_Ranger.pdf"
+                "referencia": "Motosoldadora Ranger.pdf"
               }
             ]
           },
@@ -373,7 +373,7 @@
             "soluciones": [
               "Cerrar manualmente la válvula del filtro de combustible principal para apagar en emergencia."
             ],
-            "referencia": "Motosoldadora_Ranger.pdf"
+            "referencia": "Motosoldadora Ranger.pdf"
           }
         ]
       },
@@ -387,7 +387,7 @@
             "soluciones": [
               "Reducir la carga. Limpiar aletas del radiador, tensar correa y liberar obstrucciones de aire."
             ],
-            "referencia": "Motosoldadora_Ranger.pdf"
+            "referencia": "Motosoldadora Ranger.pdf"
           },
           {
             "atributo": "El motor funciona de manera inestable",
@@ -395,7 +395,7 @@
             "soluciones": [
               "Reemplazar filtros de aire/combustible. Vaciar prefiltro si tiene agua y purgar."
             ],
-            "referencia": "Motosoldadora_Ranger.pdf"
+            "referencia": "Motosoldadora Ranger.pdf"
           }
         ]
       },
@@ -405,7 +405,7 @@
         "soluciones": [
           "Limpiar conexiones. Reemplazar batería o reparar alternador de carga."
         ],
-        "referencia": "Motosoldadora_Ranger.pdf"
+        "referencia": "Motosoldadora Ranger.pdf"
       },
       {
         "categoria": "Control de marcha lenta / Aceleración automática (Idler)",
@@ -417,7 +417,7 @@
             "soluciones": [
               "Colocar switch en 'Auto'. Desconectar toda carga auxiliar o remota."
             ],
-            "referencia": "Motosoldadora_Ranger.pdf"
+            "referencia": "Motosoldadora Ranger.pdf"
           },
           {
             "atributo": "El motor no sube a ralentí alto al soldar",
@@ -425,7 +425,7 @@
             "soluciones": [
               "Asegurar pinza de masa en metal limpio. Colocar switch de contactor en 'Welding On'."
             ],
-            "referencia": "Motosoldadora_Ranger.pdf"
+            "referencia": "Motosoldadora Ranger.pdf"
           },
           {
             "atributo": "El motor no sube a ralentí alto con potencia auxiliar",
@@ -433,7 +433,7 @@
             "soluciones": [
               "El sistema automático no detecta cargas menores a 100W. Coloque el switch manualmente en 'High'."
             ],
-            "referencia": "Motosoldadora_Ranger.pdf"
+            "referencia": "Motosoldadora Ranger.pdf"
           },
           {
             "atributo": "Falla mecánica/solenoide del acelerador",
@@ -441,7 +441,7 @@
             "soluciones": [
               "Inspeccionar el varillaje del solenoide. Si está bien, cambiar la tarjeta de control."
             ],
-            "referencia": "Motosoldadora_Ranger.pdf"
+            "referencia": "Motosoldadora Ranger.pdf"
           }
         ]
       },
@@ -455,7 +455,7 @@
             "soluciones": [
               "Revisar masa. Mover interruptor 'Weld Terminals' a 'Weld Terminals On'."
             ],
-            "referencia": "Motosoldadora_Ranger.pdf"
+            "referencia": "Motosoldadora Ranger.pdf"
           },
           {
             "atributo": "Hay corriente pero no se puede regular",
@@ -463,7 +463,7 @@
             "soluciones": [
               "Revisar cable en conector de 6/14 pines. Si persiste, sustituir potenciómetro o tarjeta."
             ],
-            "referencia": "Motosoldadora_Ranger.pdf"
+            "referencia": "Motosoldadora Ranger.pdf"
           },
           {
             "atributo": "Arco inestable o 'frío'",
@@ -471,7 +471,7 @@
             "soluciones": [
               "Sintonizar el selector de MODO (CV-WIRE, STICK, etc.). Evitar cables muy largos o enrollados."
             ],
-            "referencia": "Motosoldadora_Ranger.pdf"
+            "referencia": "Motosoldadora Ranger.pdf"
           }
         ]
       },
@@ -481,7 +481,7 @@
         "soluciones": [
           "Restablecer disyuntores de protección de 42V y 120V en el panel frontal."
         ],
-        "referencia": "Motosoldadora_Ranger.pdf"
+        "referencia": "Motosoldadora Ranger.pdf"
       },
       {
         "categoria": "Potencia Auxiliar (Tomacorrientes)",
@@ -489,7 +489,7 @@
         "soluciones": [
           "Restablecer breakers. Si tiene GFCI, presionar botón 'RESET' según manual."
         ],
-        "referencia": "Motosoldadora_Ranger.pdf"
+        "referencia": "Motosoldadora Ranger.pdf"
       }
     ]
   },
@@ -693,7 +693,7 @@
             "soluciones": [
               "Corrija la condición de cortocircuito sustituyendo el fusible de 7.5 A en el tablero de control."
             ],
-            "referencia": "Generador_Generac.pdf"
+            "referencia": "Generador de reserva automático_Generac.pdf"
           },
           {
             "atributo": "Cables de batería sueltos, corroídos o defectuosos",
@@ -701,7 +701,7 @@
             "soluciones": [
               "Apriete, limpie o sustituya los cables según sea necesario."
             ],
-            "referencia": "Generador_Generac.pdf"
+            "referencia": "Generador de reserva automático_Generac.pdf"
           },
           {
             "atributo": "Contacto del arrancador defectuoso",
@@ -709,7 +709,7 @@
             "soluciones": [
               "Sustituir el componente o comunicarse con un concesionario de servicio autorizado."
             ],
-            "referencia": "Generador_Generac.pdf"
+            "referencia": "Generador de reserva automático_Generac.pdf"
           },
           {
             "atributo": "Batería completamente agotada",
@@ -717,7 +717,7 @@
             "soluciones": [
               "Cargue o sustituya la batería."
             ],
-            "referencia": "Generador_Generac.pdf"
+            "referencia": "Generador de reserva automático_Generac.pdf"
           }
         ]
       },
@@ -731,7 +731,7 @@
             "soluciones": [
               "Cargue combustible y abra la válvula de paso."
             ],
-            "referencia": "Generador_Generac.pdf"
+            "referencia": "Generador de reserva automático_Generac.pdf"
           },
           {
             "atributo": "Solenoide de combustible (FS) defectuoso",
@@ -739,7 +739,7 @@
             "soluciones": [
               "Sustituir el solenoide. Contacte asistencia técnica."
             ],
-            "referencia": "Generador_Generac.pdf"
+            "referencia": "Generador de reserva automático_Generac.pdf"
           },
           {
             "atributo": "Falla en el cableado de control (Cable núm. 14)",
@@ -747,7 +747,7 @@
             "soluciones": [
               "Inspeccione y repare el cableado de la tarjeta."
             ],
-            "referencia": "Generador_Generac.pdf"
+            "referencia": "Generador de reserva automático_Generac.pdf"
           },
           {
             "atributo": "Bujía(s) defectuosa(s) o huelgo de válvulas fuera de ajuste",
@@ -755,7 +755,7 @@
             "soluciones": [
               "Limpie/ajuste la separación de bujías o reajuste el huelgo de las válvulas."
             ],
-            "referencia": "Generador_Generac.pdf"
+            "referencia": "Generador de reserva automático_Generac.pdf"
           }
         ]
       },
@@ -769,7 +769,7 @@
             "soluciones": [
               "Revise o sustituya el depurador de aire."
             ],
-            "referencia": "Generador_Generac.pdf"
+            "referencia": "Generador de reserva automático_Generac.pdf"
           },
           {
             "atributo": "Selector o regulador de combustible mal configurado",
@@ -777,7 +777,7 @@
             "soluciones": [
               "Configure el regulador o mueva el selector a la posición correcta de gas."
             ],
-            "referencia": "Generador_Generac.pdf"
+            "referencia": "Generador de reserva automático_Generac.pdf"
           },
           {
             "atributo": "Presión de combustible incorrecta (LP o Gas Natural)",
@@ -785,7 +785,7 @@
             "soluciones": [
               "Confirme presiones: 19-22 mm Hg (10-12 in H2O) para Gas LP, y 7-13 mm Hg (3.5-7 in H2O) para Gas Natural."
             ],
-            "referencia": "Generador_Generac.pdf"
+            "referencia": "Generador de reserva automático_Generac.pdf"
           },
           {
             "atributo": "La placa del cebador se mantiene cerrada",
@@ -793,7 +793,7 @@
             "soluciones": [
               "Verifique que la placa del cebador se mueva con total libertad."
             ],
-            "referencia": "Generador_Generac.pdf"
+            "referencia": "Generador de reserva automático_Generac.pdf"
           }
         ]
       },
@@ -803,7 +803,7 @@
         "soluciones": [
           "Repare el cableado del switch o comuníquese con servicio autorizado por tarjeta de control defectuosa."
         ],
-        "referencia": "Generador_Generac.pdf"
+        "referencia": "Generador de reserva automático_Generac.pdf"
       },
       {
         "categoria": "No hay salida de CA del generador",
@@ -811,7 +811,7 @@
         "soluciones": [
           "Reconecte el disyuntor a posición ON (CERRADO). Si persiste, es una falla interna del alternador."
         ],
-        "referencia": "Generador_Generac.pdf"
+        "referencia": "Generador de reserva automático_Generac.pdf"
       },
       {
         "categoria": "No hay transferencia a reserva tras fallo eléctrico público",
@@ -819,7 +819,7 @@
         "soluciones": [
           "Inspeccionar fusibles del interruptor de transferencia. Contactar al servicio técnico."
         ],
-        "referencia": "Generador_Generac.pdf"
+        "referencia": "Generador de reserva automático_Generac.pdf"
       },
       {
         "categoria": "LED Amarillo encendido (Alarma de Batería, Cargador o Servicio)",
@@ -831,7 +831,7 @@
             "soluciones": [
               "Vaya al MENÚ DE BATERÍA. Sustituya la batería si muestra 'COMPROBAR BATERÍA'."
             ],
-            "referencia": "Generador_Generac.pdf"
+            "referencia": "Generador de reserva automático_Generac.pdf"
           },
           {
             "atributo": "PROBLEMA DE BATERÍA / ADVERTENCIA DEL CARGADOR",
@@ -839,7 +839,7 @@
             "soluciones": [
               "Comuníquese directamente con el concesionario de servicio."
             ],
-            "referencia": "Generador_Generac.pdf"
+            "referencia": "Generador de reserva automático_Generac.pdf"
           },
           {
             "atributo": "SERVICIO A / SERVICIO B / Inspección",
@@ -847,7 +847,7 @@
             "soluciones": [
               "Efectúe el programa de mantenimiento correspondiente. Presione ENTER para borrar."
             ],
-            "referencia": "Generador_Generac.pdf"
+            "referencia": "Generador de reserva automático_Generac.pdf"
           }
         ]
       }
@@ -856,256 +856,248 @@
   "generador_cummins": {
     "categorias": [
       {
-        "categoria": "Nivel de refrigerante bajo",
-        "falla": "La entrada Nivel de refrigerante bajo está activada y la respuesta del umbral está ajustada a Parada. Dejar que el motor se enfríe completamente antes de proceder:",
-        "soluciones": [
-          "a) Buscar posibles puntos de pérdida de refrigerante y repararlos si es necesario. b) Comprobar el nivel de refrigerante y rellenar si está bajo. c) Reiniciar el control y volver a arrancar después de localizar y corregir el problema."
-        ],
-        "referencia": "Generador_Cummins.pdf"
-      },
-      {
-        "categoria": "Fallo en el arranque",
-        "falla": "Indica un posible fallo del control o del sistema de arranque. (El motor gira pero falla en el arranque). Dejar que el motor se enfríe completamente antes de proceder con las comprobaciones siguientes:",
-        "soluciones": [
-          "a) Comprobar si el depósito de combustible está vacío, si hay pérdidas de combustible o líneas de combustible bloqueadas, y corregir según sea necesario. b) Comprobar si el filtro de combustible está sucio, sustituir si es necesario. c) Comprobar si el filtro de aire está sucio o bloqueado y sustituirlo si es necesario. d) Limpiar y apretar todas las conexiones de cables de la batería e) Batería descargada o defectuosa. Recargar o sustituir f) Reiniciar el control y volver a arrancar después de corregir el problema"
-        ],
-        "referencia": "Generador_Cummins.pdf"
-      },
-      {
-        "categoria": "Presión canal de aceite baja",
-        "falla": "Indica que la presión de aceite del motor ha caído por debajo del punto de disparo de parada. Dejar que el motor se enfríe completamente antes de proceder con las comprobaciones siguientes:",
-        "soluciones": [
-          "a) Comprobar el nivel de aceite, las tuberías y los filtros. b) Si el sistema de aceite está OK pero el nivel de aceite es bajo, rellenar. c) Reiniciar el control y volver a arrancar después de localizar y corregir el problema."
-        ],
-        "referencia": "Generador_Cummins.pdf"
-      },
-      {
-        "categoria": "Comunicación entre el control del motor y el PCC degradada",
-        "falla": "La comunicación entre el control del motor (ECM) y el PCC está cortada. Dejar que el motor se enfríe completamente antes de proceder:",
-        "soluciones": [
-          "a) Asegurarse de que el botón de parada de emergencia no está activado. Reiniciar la parada de emergencia local/remota."
-        ],
-        "referencia": "Generador_Cummins.pdf"
-      },
-      {
-        "categoria": "Voltaje 1 batería bajo",
-        "falla": "Indica que el voltaje de la batería está por debajo de 24VDC y se está aproximando a un nivel bajo en el cual se producirá un funcionamiento impredecible Si el motor puede pararse, dejar que el motor se enfríe completamente antes de proceder:",
-        "soluciones": [
-          "a) Limpiar los terminales de la batería y apretar todas las conexiones b) Comprobar el nivel de electrolito, rellenar y recargar (si es aplicable) c) Batería descargada o defectuosa. Recargar o sustituir."
-        ],
-        "referencia": "Generador_Cummins.pdf"
-      },
-      {
-        "categoria": "Voltaje 1 batería alto",
-        "falla": "Indica que el voltaje de la batería al control se está aproximando a un nivel alto (super",
-        "soluciones": [],
-        "referencia": "Generador_Cummins.pdf"
-      },
-      {
-        "categoria": "Parada caliente del motor",
-        "falla": "Se ha pulsado el interruptor de emergencia o se ha pulsado el botón de parada antes de que el grupo generador complete la operación de enfriamiento",
-        "soluciones": [
-          "El grupo generador debe funcionar al 10% o menos de la carga durante tres minutos antes de la parada del motor; evitar esta parada caliente para prevenir daños en el motor"
-        ],
-        "referencia": "Generador_Cummins.pdf"
-      },
-      {
-        "categoria": "Fallo datos CAN Link",
-        "falla": "El botón de parada de emergencia está activado",
-        "soluciones": [
-          "Asegurarse de que el botón de parada de emergencia no está activado y reiniciar la parada de emergencia local/remota"
-        ],
-        "referencia": "Generador_Cummins.pdf"
-      },
-      {
-        "categoria": "Battle short activado",
-        "falla": "Se ha activado el modo Battle Short para derivar diversas paradas de fallo",
-        "soluciones": [
-          "Investigar cualquier código de fallo que se esté saltando"
-        ],
-        "referencia": "Generador_Cummins.pdf"
-      },
-      {
-        "categoria": "Entrada configurable #2, 13 y 14",
-        "falla": "La entrada configurada tiene un fallo",
-        "soluciones": [
-          "Comprobar los requisitos de la entrada # y corregir si es posible"
-        ],
-        "referencia": "Generador_Cummins.pdf"
-      },
-      {
-        "categoria": "Fallo de parada",
-        "falla": "Se ha saltado una parada mientras el grupo generador está en modo Battle Short",
-        "soluciones": [
-          "Localizar y solucionar el fallo de parada que está causando que se pare el grupo generador"
-        ],
-        "referencia": "Generador_Cummins.pdf"
-      },
-      {
-        "categoria": "Parada de emergencia local/Parada de emergencia remota",
-        "falla": "Se ha activado una parada de emergencia local o remota",
-        "soluciones": [
-          "Desactivar el botón de parada de emergencia, pulsarlo y luego reiniciar; asegurarse de que el botón está funcionando correctamente"
-        ],
-        "referencia": "Generador_Cummins.pdf"
-      },
-      {
-        "categoria": "El equipo no arranca",
-        "pregunta": "¿Cuál de estas causas corresponde? (verificá en el equipo)",
+        "categoria": "Códigos de Motor Base (Códigos 111 a 197)",
+        "pregunta": "CUMMINS - Seleccione el código de falla exacto:",
         "ramas": [
           {
-            "atributo": "El calentador de refrigerante del motor no funciona o no hay refrigerante circulando",
-            "falla": "El calentador de refrigerante del motor no funciona o no hay refrigerante circulando",
+            "atributo": "Código 111: Internal ECM Failure",
+            "falla": "Fallo interno del módulo de control (ECM).",
             "soluciones": [
-              "Comprobar si el fusible está fundido o el cable del calentador desconectado y corregir según sea necesario"
+              "Estatus: PARADA. Requiere reemplazo o reprogramación del ECM por servicio autorizado."
             ],
-            "referencia": "Generador_Cummins.pdf"
+            "referencia": "Generador CUMMINS 2.pdf"
           },
           {
-            "atributo": "Buscar posibles fugas de refrigerante y repararlas según se requiera",
-            "falla": "Buscar posibles fugas de refrigerante y repararlas según se requiera",
+            "atributo": "Código 115: Eng Crank Sensor Error",
+            "falla": "Error en el sensor de giro del cigüeñal.",
             "soluciones": [
-              "NADA"
+              "Estatus: PARADA. Revisar cableado y sensor de posición del motor."
             ],
-            "referencia": "Generador_Cummins.pdf"
+            "referencia": "Generador CUMMINS 2.pdf"
           },
           {
-            "atributo": "Comprobar si el nivel de refrigerante es bajo y rellenar si es necesario",
-            "falla": "Comprobar si el nivel de refrigerante es bajo y rellenar si es necesario",
+            "atributo": "Código 122 / 123 / 124: Manifold 1 Press High / Low",
+            "falla": "Falla de lectura en presión del colector de admisión.",
             "soluciones": [
-              "NADA"
+              "Estatus: ADVERTENCIA. Limpiar o sustituir el sensor de presión del múltiple."
             ],
-            "referencia": "Generador_Cummins.pdf"
+            "referencia": "Generador CUMMINS 2.pdf"
           },
           {
-            "atributo": "El suministro del depósito de combustible diario está funcionando bajo",
-            "falla": "El suministro del depósito de combustible diario está funcionando bajo",
+            "atributo": "Código 135 / 141 / 143: Oil Rifle Pressure High / Low",
+            "falla": "Presión de aceite anormal en el conducto principal (Rifle).",
             "soluciones": [
-              "Buscar posibles fugas de combustible y repararlas según se requiera"
+              "Estatus: ADVERTENCIA. Verificar niveles físicos y sensor de presión de aceite."
             ],
-            "referencia": "Generador_Cummins.pdf"
+            "referencia": "Generador CUMMINS 2.pdf"
           },
           {
-            "atributo": "Comprobar si el nivel de combustible es bajo y rellenar si es necesario",
-            "falla": "Comprobar si el nivel de combustible es bajo y rellenar si es necesario",
+            "atributo": "Código 144 / 145 / 151: Coolant Temp High / Low",
+            "falla": "Temperatura del refrigerante crítica o fuera de rango.",
             "soluciones": [
-              "NADA"
+              "Estatus: ADVERTENCIA / PARADA. Revisar el radiador, termostato y líquido refrigerante."
             ],
-            "referencia": "Generador_Cummins.pdf"
+            "referencia": "Generador CUMMINS 2.pdf"
           },
           {
-            "atributo": "Indica que el nivel de combustible está por debajo del ajuste del umbral de bajo nivel de combustible respecto al ajuste de tiempo",
-            "falla": "Indica que el nivel de combustible está por debajo del ajuste del umbral de bajo nivel de combustible respecto al ajuste de tiempo",
+            "atributo": "Código 153 / 155: High Intake Manifold Temperature",
+            "falla": "Alta temperatura de aire en el múltiple de admisión.",
             "soluciones": [
-              "Buscar posibles fugas de combustible y repararlas según se requiera"
+              "Estatus: ADVERTENCIA / PARADA. Comprobar postenfriador y restricciones de flujo."
             ],
-            "referencia": "Generador_Cummins.pdf"
+            "referencia": "Generador CUMMINS 2.pdf"
+          },
+          {
+            "atributo": "Código 195 / 196 / 197: Coolant Level High / Low",
+            "falla": "Nivel de refrigerante alto o bajo.",
+            "soluciones": [
+              "Estatus: ADVERTENCIA. Ajustar el nivel de líquido refrigerante en el tanque de expansión."
+            ],
+            "referencia": "Generador CUMMINS 2.pdf"
           }
         ]
       },
       {
-        "categoria": "El motor no arranca",
-        "pregunta": "¿Cuál de estas causas corresponde? (verificá en el equipo)",
+        "categoria": "Códigos de Presión y Velocidad (Códigos 212 a 295)",
+        "pregunta": "CUMMINS - Seleccione el código de falla exacto:",
         "ramas": [
           {
-            "atributo": "Indica un posible fallo del control, del sensor de velocidad o del sistema de arranque",
-            "falla": "Indica un posible fallo del control, del sensor de velocidad o del sistema de arranque",
+            "atributo": "Código 212 / 213 / 214: High / Low Oil Temperature",
+            "falla": "Temperatura del aceite fuera de límites.",
             "soluciones": [
-              "Ver código 441 para la acción correctora"
+              "Estatus: PARADA (Código 214). Detener el equipo, revisar enfriador de aceite."
             ],
-            "referencia": "Generador_Cummins.pdf"
+            "referencia": "Generador CUMMINS 2.pdf"
           },
           {
-            "atributo": "Asegurarse de que el botón de parada de emergencia está desengranado",
-            "falla": "Asegurarse de que el botón de parada de emergencia está desengranado",
+            "atributo": "Código 221 / 222: Air Pressure Sensor High / Low",
+            "falla": "Error de sensor de presión barométrica/aire.",
             "soluciones": [
-              "NADA"
+              "Estatus: ADVERTENCIA. Inspeccionar sensor de presión de aire ambiente."
             ],
-            "referencia": "Generador_Cummins.pdf"
+            "referencia": "Generador CUMMINS 2.pdf"
           },
           {
-            "atributo": "Indica que durante el arranque, el voltaje de la batería está en, o por debajo del punto de disparo de advertencia de batería baja durante un período igual o mayor que al tiempo ajustado de batería baja",
-            "falla": "Indica que durante el arranque, el voltaje de la batería está en, o por debajo del punto de disparo de advertencia de batería baja durante un período igual o mayor que al tiempo ajustado de batería baja",
+            "atributo": "Código 228 / 231 / 232: Low / High Coolant Pressure",
+            "falla": "Presión de refrigerante incorrecta.",
             "soluciones": [
-              "Ver código 441"
+              "Estatus: PARADA / ADVERTENCIA. Revisar bomba de agua y restricciones de flujo."
             ],
-            "referencia": "Generador_Cummins.pdf"
+            "referencia": "Generador CUMMINS 2.pdf"
           },
           {
-            "atributo": "Durante el arranque, el voltaje de la batería ha caído por debajo del voltaje operativo del PCC, lo que reinicia el PCC. Después de tres reinicios consecutivos, se activará el código de evento/fallo 1443",
-            "falla": "Durante el arranque, el voltaje de la batería ha caído por debajo del voltaje operativo del PCC, lo que reinicia el PCC. Después de tres reinicios consecutivos, se activará el código de evento/fallo 1443",
+            "atributo": "Código 234: Crankshaft Speed High (Overspeed)",
+            "falla": "Sobrevelocidad del motor (Crankshaft Speed High).",
             "soluciones": [
-              "Ver código 441"
+              "Estatus: PARADA. El motor se apagó para protegerse. Revisar actuador de combustible y gobernación."
             ],
-            "referencia": "Generador_Cummins.pdf"
+            "referencia": "Generador CUMMINS 2.pdf"
           },
           {
-            "atributo": "Indica que la frecuencia del grupo generador ha caído por debajo del 90% del nominal durante aproximadamente diez segundos",
-            "falla": "Indica que la frecuencia del grupo generador ha caído por debajo del 90% del nominal durante aproximadamente diez segundos",
+            "atributo": "Código 235: Low Coolant Level (Shutdown)",
+            "falla": "Nivel de refrigerante críticamente bajo.",
             "soluciones": [
-              "Comprobar el suministro de combustible"
+              "Estatus: PARADA. Rellenar refrigerante de inmediato y buscar fugas."
             ],
-            "referencia": "Generador_Cummins.pdf"
+            "referencia": "Generador CUMMINS 2.pdf"
           },
           {
-            "atributo": "Comprobar el suministro de la entrada de aire",
-            "falla": "Comprobar el suministro de la entrada de aire",
+            "atributo": "Código 236: Both Engine Speed Signals Lost",
+            "falla": "Pérdida de ambas señales de velocidad/giro.",
             "soluciones": [
-              "NADA"
+              "Estatus: PARADA. Inspeccionar sensores de árbol de levas y cigüeñal."
             ],
-            "referencia": "Generador_Cummins.pdf"
-          },
-          {
-            "atributo": "Comprobar la carga y corregir cualquier sobrecarga",
-            "falla": "Comprobar la carga y corregir cualquier sobrecarga",
-            "soluciones": [
-              "NADA"
-            ],
-            "referencia": "Generador_Cummins.pdf"
+            "referencia": "Generador CUMMINS 2.pdf"
           }
         ]
       },
       {
-        "categoria": "El equipo se detiene",
-        "falla": "Exceso de frecuencia",
-        "soluciones": [
-          "Dejar que el motor se enfríe completamente; comprobar el suministro de combustible; comprobar el suministro de la entrada de aire; corregir cualquier sobrecarga."
-        ],
-        "referencia": "Generador_Cummins.pdf"
-      },
-      {
-        "categoria": "El equipo emite una advertencia",
-        "pregunta": "¿Cuál de estas causas corresponde? (verificá en el equipo)",
+        "categoria": "Códigos de Inyectores y Sensores (Códigos 322 a 488)",
+        "pregunta": "CUMMINS - Seleccione el código de falla exacto:",
         "ramas": [
           {
-            "atributo": "Agua en el combustible en niveles prealtaos",
-            "falla": "Agua en el combustible en niveles prealtaos",
+            "atributo": "Códigos 322 al 332: Injector Solenoid Low Current (Cil. 1-6)",
+            "falla": "Bajo consumo de corriente en solenoides de inyectores.",
             "soluciones": [
-              "Dejar que el motor se enfríe completamente; comprobar el combustible en el depósito (local o remoto); drenar y rellenar si es necesario; tener en cuenta las cuestiones de seguridad."
+              "Estatus: ADVERTENCIA. Revisar el arnés interno de inyectores y conexiones bajo la tapa de válvulas."
             ],
-            "referencia": "Generador_Cummins.pdf"
+            "referencia": "Generador CUMMINS 2.pdf"
           },
           {
-            "atributo": "Nivel bajo de refrigerante en el segundo radiador",
-            "falla": "Nivel bajo de refrigerante en el segundo radiador",
+            "atributo": "Código 342 / 343: Calibration Code Fail / ECM Hardware Failure",
+            "falla": "Fallo de calibración o hardware de la computadora.",
             "soluciones": [
-              "Dejar que el motor se enfríe completamente; buscar posibles puntos de pérdida de refrigerante y repararlos si es necesario; comprobar el nivel de refrigerante y rellenar si está bajo; reiniciar el control y volver a arrancar después de localizar y corregir el problema."
+              "Estatus: PARADA / ADVERTENCIA. Cargar el software correcto o reemplazar ECM."
             ],
-            "referencia": "Generador_Cummins.pdf"
+            "referencia": "Generador CUMMINS 2.pdf"
           },
           {
-            "atributo": "Fallo en el sistema de arranque",
-            "falla": "Fallo en el sistema de arranque",
+            "atributo": "Código 352 / 386: Sensor Supply 1 Low / High",
+            "falla": "Voltaje de alimentación de sensores 5V fuera de rango.",
             "soluciones": [
-              "Remitirse a los códigos de fallo 359 y 1438."
+              "Estatus: ADVERTENCIA. Buscar un sensor en corto que esté tirando la línea de 5V."
             ],
-            "referencia": "Generador_Cummins.pdf"
+            "referencia": "Generador CUMMINS 2.pdf"
+          },
+          {
+            "atributo": "Código 359: Fail to Start",
+            "falla": "El motor falló al arrancar después de los intentos programados.",
+            "soluciones": [
+              "Estatus: PARADA. Comprobar suministro de combustible, aire y estado del motor de arranque."
+            ],
+            "referencia": "Generador CUMMINS 2.pdf"
+          },
+          {
+            "atributo": "Código 415: Low Oil Rifle Pressure (Shutdown)",
+            "falla": "Presión de aceite críticamente baja en la línea principal.",
+            "soluciones": [
+              "Estatus: PARADA. Detener operación. Comprobar bomba de aceite, filtros y nivel de cárter."
+            ],
+            "referencia": "Generador CUMMINS 2.pdf"
+          },
+          {
+            "atributo": "Código 418: High H2O in Fuel",
+            "falla": "Presencia de agua en el combustible.",
+            "soluciones": [
+              "Estatus: ADVERTENCIA. Drenar el agua acumulada en el filtro separador combustible/agua."
+            ],
+            "referencia": "Generador CUMMINS 2.pdf"
+          },
+          {
+            "atributo": "Código 441 / 442: Low / High Battery 1 Voltage",
+            "falla": "Voltaje de batería bajo o alto.",
+            "soluciones": [
+              "Estatus: ADVERTENCIA. Revisar alternador de carga y estado físico de baterías."
+            ],
+            "referencia": "Generador CUMMINS 2.pdf"
+          }
+        ]
+      },
+      {
+        "categoria": "Códigos de Presión Inyección y Sistema Alternador (Códigos 546 a 1442+)",
+        "pregunta": "CUMMINS - Seleccione el código de falla exacto:",
+        "ramas": [
+          {
+            "atributo": "Código 449 / 451 / 452 / 559: Injector Metering Pressure High / Low",
+            "falla": "Presión del riel común / dosificación de inyección incorrecta.",
+            "soluciones": [
+              "Estatus: PARADA / ADVERTENCIA. Revisar la bomba de alta presión y la válvula de control de flujo (FCA)."
+            ],
+            "referencia": "Generador CUMMINS 2.pdf"
+          },
+          {
+            "atributo": "Código 556: Crankcase Pressure High",
+            "falla": "Alta presión en el cárter (Gases internos excesivos).",
+            "soluciones": [
+              "Estatus: PARADA. Revisar el filtro del respiradero del cárter (Breather) o desgaste interno de anillos."
+            ],
+            "referencia": "Generador CUMMINS 2.pdf"
+          },
+          {
+            "atributo": "Código 781: CAN Data Link Failure",
+            "falla": "Fallo de comunicación en el enlace de datos J1939 CAN.",
+            "soluciones": [
+              "Estatus: PARADA. Comprobar la continuidad de las líneas CAN_H y CAN_L, y las resistencias de terminación de 120 ohms."
+            ],
+            "referencia": "Generador CUMMINS 2.pdf"
+          },
+          {
+            "atributo": "Código 1224 / 1225 / 1226: Genset Overvoltage / Undervoltage / Frequency",
+            "falla": "Anomalía en los parámetros de generación eléctrica de CA.",
+            "soluciones": [
+              "Estatus: ADVERTENCIA. Verificar la calibración del regulador automático de voltaje (AVR) y velocidad."
+            ],
+            "referencia": "Generador CUMMINS 2.pdf"
+          },
+          {
+            "atributo": "Código 1433 / 1434: Local / Remote Emergency Stop",
+            "falla": "Botón de parada de emergencia (Local o Remoto) activado.",
+            "soluciones": [
+              "Estatus: PARADA. Destrabar el botón de parada de emergencia (hongo) y resetear la alarma en el panel de control."
+            ],
+            "referencia": "Generador CUMMINS 2.pdf"
+          },
+          {
+            "atributo": "Código 1435: Low Coolant Temperature",
+            "falla": "Baja temperatura del bloque de cilindros.",
+            "soluciones": [
+              "Estatus: ADVERTENCIA. Comprobar el funcionamiento del calentador de camisas (Block Heater)."
+            ],
+            "referencia": "Generador CUMMINS 2.pdf"
+          },
+          {
+            "atributo": "Código 1438: Fail To Crank",
+            "falla": "El motor no efectúa el ciclo mecánico de viraje por el arrancador.",
+            "soluciones": [
+              "Estatus: PARADA. Comprobar solenoide de arranque, marchas físicas y relés de potencia."
+            ],
+            "referencia": "Generador CUMMINS 2.pdf"
           }
         ]
       }
     ]
   },
-  "secador_de_aire_dmd": {
+  "secador_aire_dmd": {
     "categorias": []
   }
 }

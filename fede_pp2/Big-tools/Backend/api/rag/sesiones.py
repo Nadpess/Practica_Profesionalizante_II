@@ -19,13 +19,17 @@ _lock = threading.Lock()
 
 # ── CRUD de sesiones ──────────────────────────────────────────────────────────
 
-def crear_sesion(nombre_maquina: str) -> str:
-    """Crea una nueva sesión y retorna el session_id."""
+def crear_sesion(nombre_maquina: str, contexto: str = "") -> str:
+    """Crea una nueva sesión y retorna el session_id.
+    'contexto' = ancla fija del diagnóstico previo (síntoma/causa/solución del SE),
+    que se mantiene siempre en el prompt para que el chat sea contextual."""
     session_id = str(uuid.uuid4())
     with _lock:
         _sesiones[session_id] = {
             "maquina":        nombre_maquina,
             "mensajes":       [],
+            "contexto":       contexto,   # ancla fija (no se resume nunca)
+            "resumen":        "",          # resumen rodante de los turnos viejos
             "ultimo_acceso":  time.time(),
         }
     return session_id
@@ -68,6 +72,18 @@ def obtener_historial(session_id: str) -> List[dict]:
     """Retorna la lista de mensajes de la sesión."""
     sesion = obtener_sesion(session_id)
     return sesion["mensajes"] if sesion else []
+
+
+def fijar_resumen(session_id: str, resumen: str, mantener_ultimos: int = 4):
+    """Guarda el resumen rodante y deja solo los últimos N mensajes literales
+    (los viejos quedan comprimidos en el resumen → no se pierde la ventana de contexto)."""
+    with _lock:
+        sesion = _sesiones.get(session_id)
+        if not sesion:
+            return
+        sesion["resumen"] = resumen
+        sesion["mensajes"] = sesion["mensajes"][-mantener_ultimos:]
+        sesion["ultimo_acceso"] = time.time()
 
 
 def limpiar_sesion(session_id: str):

@@ -12,6 +12,10 @@ from typing import Optional
 # Punto ÚNICO para cambiar de modelo en todo el sistema (chat, análisis, traducción).
 # Para probar otro: `ollama pull <modelo>` y cambiar esta línea.
 LLM_MODEL = "qwen2.5:3b"  # 3B, SIN razonamiento, entra 100% en GPU de 4 GB (rápido)
+# Modelo para GENERAR árboles de conocimiento (tarea de admin, una sola vez).
+# Puede ser uno más grande/lento (ej. "qwen2.5:7b") porque no es runtime. Por
+# defecto usa el mismo que el runtime para no tener que descargar otro.
+LLM_MODEL_GEN = "qwen2.5:7b"  # modelo más grande para generar árboles (mejor calidad)
 # Tiempo que Ollama mantiene el modelo cargado en memoria entre consultas
 # (evita la demora de recargarlo en cada pregunta).
 LLM_KEEP_ALIVE = "30m"

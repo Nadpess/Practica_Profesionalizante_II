@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="stylesheet" href="/static/css/admin.css?v=20260606">
 </head>
 
 <body>
@@ -305,13 +305,33 @@
         </main>
     </div>
 
+    <!-- Modal: árbol generado (revisión + aprobación) -->
+    <div id="arbol-modal" class="arbol-overlay" style="display:none;">
+        <div class="arbol-panel">
+            <div class="arbol-head">
+                <span id="arbol-titulo">Árbol generado</span>
+                <button class="arbol-close" onclick="cerrarModalArbol()">✕</button>
+            </div>
+            <p id="arbol-msg" class="arbol-msg"></p>
+            <div id="arbol-progreso-wrap" class="arbol-progreso-wrap" style="display:none;">
+                <div class="arbol-progreso-track"><div id="arbol-bar" class="arbol-progreso-bar"></div></div>
+            </div>
+            <p class="arbol-hint">Revisá y editá el árbol (es un borrador). Cuando esté bien, aprobalo para activarlo en el sistema experto.</p>
+            <textarea id="arbol-json" class="arbol-json" spellcheck="false"></textarea>
+            <div class="arbol-actions">
+                <button class="manual-btn" onclick="cerrarModalArbol()">Cancelar</button>
+                <button class="manual-btn arbol-aprobar" onclick="aprobarArbol()">✅ Aprobar y activar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Librería Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <!-- Librería jsPDF para exportar a PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Configuración de la API (debe cargarse antes de admin.js) -->
     <script src="/static/js/config.js"></script>
-    <script src="/static/js/admin.js"></script>
+    <script src="/static/js/admin.js?v=20260606"></script>
 </body>
 
 </html>

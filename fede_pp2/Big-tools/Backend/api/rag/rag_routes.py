@@ -8,8 +8,8 @@ from fastapi import APIRouter, HTTPException, Body
 from fastapi.responses import StreamingResponse
 
 from api.rag.indexador import indexar_manual, esta_indexado, get_progreso
-from api.rag.retriever import generar_respuesta, generar_respuesta_stream, generar_respuesta_stream_conversacional
-from api.rag.sesiones import crear_sesion, obtener_historial, agregar_mensaje, limpiar_sesion, limpiar_expiradas
+from api.rag.retriever import generar_respuesta, generar_respuesta_stream, generar_respuesta_stream_conversacional, resumir_conversacion
+from api.rag.sesiones import crear_sesion, obtener_historial, obtener_sesion, agregar_mensaje, fijar_resumen, limpiar_sesion, limpiar_expiradas
 from api.rag import normalizar_nombre_coleccion
 
 rag_router  = APIRouter(prefix="/api/rag", tags=["RAG"])
@@ -193,10 +193,14 @@ def estado():
 # ── Sesión conversacional ─────────────────────────────────────────────────────
 
 @rag_router.post("/sesion")
-def nueva_sesion(nombre_maquina: str = Body(..., embed=True)):
-    """Crea una nueva sesión conversacional para una máquina."""
+def nueva_sesion(
+    nombre_maquina: str = Body(..., embed=True),
+    contexto:       str = Body("", embed=True),
+):
+    """Crea una nueva sesión conversacional para una máquina.
+    'contexto' (opcional) = resumen del diagnóstico previo del SE, para un chat contextual."""
     limpiar_expiradas()
-    session_id = crear_sesion(nombre_maquina)
+    session_id = crear_sesion(nombre_maquina, contexto)
     return {"session_id": session_id}
 
 
@@ -224,7 +228,11 @@ def consulta_conversacional(
             detail="El manual no está indexado. Indexalo desde el panel de administración.",
         )
 
-    historial = obtener_historial(session_id)
+    # Leer la sesión: ancla del diagnóstico (contexto), resumen rodante e historial.
+    sesion        = obtener_sesion(session_id) or {}
+    contexto_diag = sesion.get("contexto", "")
+    resumen       = sesion.get("resumen", "")
+    historial     = list(sesion.get("mensajes", []))
 
     # Guardar mensaje del usuario en la sesión
     agregar_mensaje(session_id, "user", pregunta)
@@ -232,9 +240,9 @@ def consulta_conversacional(
     _registrar_stat(nombre_maquina, pregunta)
 
     def _stream_con_guardado():
-        """Wrapper que intercepta 'respuesta_completa' para guardarla en la sesión."""
+        """Wrapper que guarda la respuesta y, si la charla creció, comprime lo viejo."""
         for evento_str in generar_respuesta_stream_conversacional(
-            nombre_maquina, pregunta, historial
+            nombre_maquina, pregunta, historial, contexto_diag, resumen
         ):
             yield evento_str
             # Detectar el evento con la respuesta completa y guardarla
@@ -246,6 +254,15 @@ def consulta_conversacional(
                         agregar_mensaje(session_id, "assistant", ev["texto"])
                 except Exception:
                     pass
+        # ── Resumen rodante lazy: solo si la conversación se hizo larga ──────────
+        try:
+            s2 = obtener_sesion(session_id)
+            if s2 and len(s2.get("mensajes", [])) > 8:
+                viejos = s2["mensajes"][:-4]
+                nuevo  = resumir_conversacion(contexto_diag, resumen, viejos)
+                fijar_resumen(session_id, nuevo, 4)
+        except Exception:
+            pass
 
     return StreamingResponse(
         _stream_con_guardado(),

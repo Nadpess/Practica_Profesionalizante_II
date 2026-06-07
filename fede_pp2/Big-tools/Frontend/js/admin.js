@@ -581,6 +581,9 @@ async function cargarListaManuales() {
           <button class="manual-btn view" onclick="abrirManual('${manual.archivo}')">
             Ver
           </button>
+          <button class="manual-btn arbol" onclick="generarArbol('${manual.nombre}')">
+            🌳 Generar árbol
+          </button>
           <button class="manual-btn delete" onclick="confirmarEliminarManual('${manual.archivo}')">
             Eliminar
           </button>
@@ -1419,4 +1422,103 @@ document.addEventListener("DOMContentLoaded", () => {
   inicializarPestanas();
   inicializarFormularioSubida();
 });
+
+// -----------------------------------------
+// GENERACIÓN AUTOMÁTICA DE ÁRBOL (borrador) + VALIDACIÓN
+// -----------------------------------------
+
+let _arbolMaquinaActual = null;
+
+let _arbolPoll = null;
+
+async function generarArbol(nombre) {
+  const token = localStorage.getItem("chatbot_token");
+  _arbolMaquinaActual = nombre;
+  document.getElementById("arbol-titulo").textContent = "Generar árbol — " + nombre;
+  document.getElementById("arbol-json").value = "";
+  document.getElementById("arbol-progreso-wrap").style.display = "block";
+  _arbolSetProgreso(0, "Iniciando… (esto puede tardar varios minutos)", null);
+  document.getElementById("arbol-modal").style.display = "flex";
+  try {
+    const r = await fetch(`${API_URL}/admin/arbol/generar/${encodeURIComponent(nombre)}`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}` },
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.detail || "Error al iniciar");
+    _arbolPollProgreso(nombre);
+  } catch (e) {
+    document.getElementById("arbol-msg").textContent = "Error: " + e.message;
+  }
+}
+
+function _arbolSetProgreso(pct, texto, seg) {
+  const bar = document.getElementById("arbol-bar");
+  if (bar) bar.style.width = (pct || 0) + "%";
+  let t = texto || "";
+  if (seg != null && seg > 0) {
+    const m = Math.floor(seg / 60), s = seg % 60;
+    t += m > 0 ? `  (~${m}m ${s}s restantes)` : `  (~${s}s restantes)`;
+  }
+  document.getElementById("arbol-msg").textContent = t;
+}
+
+function _arbolPollProgreso(nombre) {
+  const token = localStorage.getItem("chatbot_token");
+  clearInterval(_arbolPoll);
+  _arbolPoll = setInterval(async () => {
+    try {
+      const r = await fetch(`${API_URL}/admin/arbol/progreso/${encodeURIComponent(nombre)}`, {
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+      const p = await r.json();
+      _arbolSetProgreso(p.porcentaje, p.mensaje, p.segundos_restantes);
+      if (p.estado === "completado") {
+        clearInterval(_arbolPoll);
+        document.getElementById("arbol-progreso-wrap").style.display = "none";
+        document.getElementById("arbol-json").value =
+          JSON.stringify({ categorias: (p.arbol && p.arbol.categorias) || [] }, null, 2);
+      } else if (p.estado === "error") {
+        clearInterval(_arbolPoll);
+        document.getElementById("arbol-progreso-wrap").style.display = "none";
+        document.getElementById("arbol-msg").textContent = p.mensaje || "Error";
+      }
+    } catch (e) { /* reintentar */ }
+  }, 1500);
+}
+
+async function aprobarArbol() {
+  const token = localStorage.getItem("chatbot_token");
+  const ta = document.getElementById("arbol-json");
+  const msg = document.getElementById("arbol-msg");
+  let arbol;
+  try {
+    arbol = JSON.parse(ta.value);
+  } catch (e) {
+    msg.textContent = "⚠️ El JSON tiene un error de formato: " + e.message;
+    return;
+  }
+  if (!arbol.categorias || !Array.isArray(arbol.categorias)) {
+    msg.textContent = "⚠️ El JSON debe tener una lista 'categorias'.";
+    return;
+  }
+  try {
+    const r = await fetch(`${API_URL}/admin/arbol/aprobar/${encodeURIComponent(_arbolMaquinaActual)}`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ categorias: arbol.categorias }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.detail || "Error al aprobar");
+    msg.textContent = "✅ " + data.mensaje;
+    setTimeout(cerrarModalArbol, 1400);
+  } catch (e) {
+    msg.textContent = "Error al aprobar: " + e.message;
+  }
+}
+
+function cerrarModalArbol() {
+  clearInterval(_arbolPoll);
+  document.getElementById("arbol-modal").style.display = "none";
+}
 

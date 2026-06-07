@@ -1,0 +1,52 @@
+{
+  "categorias": [
+    {
+      "categoria": "Fuga en el sistema de alta presión",
+      "falla": "Verificar la estanqueidad del sistema de alta presión y las conexiones.",
+      "soluciones": [
+        "NADA"
+      ],
+      "referencia": "Hidrolavadora_Karcher.pdf"
+    },
+    {
+      "categoria": "Falta de agua",
+      "falla": "Comprobar la conexión de agua y las tuberías.",
+      "soluciones": [
+        "NADA"
+      ],
+      "referencia": "Hidrolavadora_Karcher.pdf"
+    },
+    {
+      "categoria": "El interruptor de láminas flexibles está pegado en el dispositivo de seguridad contra el funcionamiento en seco.",
+      "falla": "Comprobar el dispositivo de seguridad contra el funcionamiento en seco.",
+      "soluciones": [
+        "NADA"
+      ],
+      "referencia": "Hidrolavadora_Karcher.pdf"
+    },
+    {
+      "categoria": "Motor sobrecargado/sobrecalentado",
+      "falla": "Ponga el interruptor del aparato en \"0/OFF\".",
+      "soluciones": [
+        "Deje enfriar el aparato."
+      ],
+      "referencia": "Hidrolavadora_Karcher.pdf"
+    },
+    {
+      "categoria": "Fallos en la alimentación de tensión.",
+      "falla": "Comprobar el cable de conexión y los fusibles de red.",
+      "soluciones": [
+        "Avisar al servicio técnico."
+      ],
+      "referencia": "Hidrolavadora_Karcher.pdf"
+    },
+    {
+      "categoria": "Consumo de corriente demasiado alto.",
+      "falla": "Comprobar el cable de conexión y los fusibles de red.",
+      "soluciones": [
+        "Avisar al servicio técnico."
+      ],
+      "referencia": "Hidrolavadora_Karcher.pdf"
+    }
+  ]
+}

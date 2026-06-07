@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Big Tools — Prototipo Chat B</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#d32f2f; --red-dark:#a51c1c; --red-tint:#fdecec; --red-tint-2:#f6d4d4;
+  --ink:#1b1b1d; --ink-soft:#6a6a70; --line:#e8e4e4; --bg-soft:#f6f4f4;
+  --shadow:0 1px 2px rgba(0,0,0,.04), 0 14px 36px rgba(20,10,10,.08);
+  --glow:0 6px 20px rgba(211,47,47,.35);
+  --font:'Inter',system-ui,sans-serif; --display:'Space Grotesk','Inter',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:var(--font);}
+html,body{height:100%;}
+body{
+  color:var(--ink);
+  background:
+    radial-gradient(1100px 600px at 12% -10%, #fff 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(900px 500px at 110% 8%, #fbe4e4 0%, rgba(251,228,228,0) 55%),
+    linear-gradient(160deg,#e8eaed 0%,#eeeb ea 45%,#e6e7ea 100%);
+  overflow:hidden;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55;
+  background-image:
+    linear-gradient(rgba(20,20,30,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(20,20,30,.04) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(85% 75% at 50% 30%,#000 55%,transparent 100%);
+}
+#particles{position:fixed;inset:0;z-index:1;pointer-events:none;}
+
+/* ===== Stage + panel ===== */
+.stage{position:relative;z-index:2;height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.panel{
+  width:min(720px,100%);height:min(880px,90vh);
+  background:#fff;border:1px solid var(--line);border-radius:20px;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;
+  animation:panelIn .5s cubic-bezier(.2,.7,.3,1) both;
+}
+@keyframes panelIn{from{opacity:0;transform:translateY(14px) scale(.99);}to{opacity:1;transform:none;}}
+
+/* Header del panel */
+.p-head{display:flex;align-items:center;gap:11px;padding:14px 18px;border-bottom:1px solid var(--line);}
+.brand-badge{
+  width:36px;height:36px;border-radius:11px;background:linear-gradient(145deg,var(--red),var(--red-dark));
+  display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:var(--glow);flex-shrink:0;
+}
+.brand-badge svg{width:20px;height:20px;}
+.brand-name{font-family:var(--display);font-weight:600;font-size:15px;}
+.brand-status{font-size:12px;color:#1d9e75;display:flex;align-items:center;gap:5px;}
+.brand-status .live{width:7px;height:7px;border-radius:50%;background:#1d9e75;box-shadow:0 0 0 0 rgba(29,158,117,.5);animation:pulse 2.4s infinite;}
+.p-head .spacer{flex:1;}
+.icon-btn{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--ink-soft);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.icon-btn:hover{border-color:var(--red);color:var(--red-dark);}
+.icon-btn svg{width:17px;height:17px;}
+
+/* Barra de contexto */
+.context-bar{
+  display:flex;align-items:center;gap:11px;margin:13px 16px 0;padding:11px 15px;border-radius:13px;
+  background:linear-gradient(120deg,var(--red-tint),#fff);border:1px solid var(--red-tint-2);
+  animation:dropIn .5s cubic-bezier(.2,.7,.3,1) both;
+}
+.context-icon{width:34px;height:34px;border-radius:50%;background:#fff;border:1px solid var(--red-tint-2);display:flex;align-items:center;justify-content:center;color:var(--red);flex-shrink:0;}
+.context-icon svg{width:18px;height:18px;}
+.context-equipo{font-family:var(--display);font-weight:600;font-size:13.5px;color:var(--red-dark);}
+.context-falla{font-size:12px;color:#a13030;}
+
+/* Mensajes */
+.messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:13px;background:#faf8f8;}
+.row{display:flex;gap:9px;align-items:flex-start;max-width:90%;animation:msgIn .42s cubic-bezier(.2,.7,.3,1) both;}
+.row.user{align-self:flex-end;max-width:80%;}
+.avatar{width:30px;height:30px;border-radius:50%;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--red);flex-shrink:0;margin-top:2px;box-shadow:0 2px 6px rgba(0,0,0,.05);}
+.avatar svg{width:17px;height:17px;}
+.bubble{background:#fff;border:1px solid var(--line);border-radius:15px;border-top-left-radius:5px;padding:10px 14px;font-size:13.5px;line-height:1.55;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.row.user .bubble{background:linear-gradient(135deg,var(--red),var(--red-dark));color:#fff;border:none;border-radius:15px;border-bottom-right-radius:5px;box-shadow:0 4px 14px rgba(211,47,47,.25);}
+.bubble b{font-weight:600;}
+
+/* Tarjeta de diagnóstico */
+.diag-card{background:#fff;border:1px solid var(--line);border-radius:15px;border-top-left-radius:5px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,.04);transition:transform .2s, box-shadow .2s;}
+.diag-card:hover{transform:translateY(-2px);box-shadow:0 16px 36px rgba(20,10,10,.1);}
+.sev{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:999px;background:#faeeda;color:#854f0b;margin-bottom:11px;}
+.sev .dot{width:7px;height:7px;border-radius:50%;background:#ef9f27;animation:pulse 2s infinite;}
+.diag-line{font-size:13.5px;line-height:1.55;margin-bottom:9px;}
+.diag-line .k{font-weight:600;}
+.steps{font-size:13.5px;line-height:1.5;}
+.step{display:flex;gap:9px;padding:3px 0;}
+.step .n{color:var(--red);font-weight:600;flex-shrink:0;}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;}
+.chip-src{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;padding:4px 10px;border-radius:999px;background:var(--bg-soft);border:1px solid var(--line);color:var(--ink-soft);cursor:pointer;transition:all .15s;}
+.chip-src:hover{background:var(--red-tint);border-color:var(--red);color:var(--red-dark);}
+.chip-src svg{width:13px;height:13px;}
+
+/* Acciones */
+.actions-stack{display:flex;flex-direction:column;gap:8px;margin-left:39px;animation:msgIn .42s .05s both;}
+.actions-row{display:flex;gap:8px;}
+.actions-row .btn{flex:1;justify-content:center;}
+.btn-full{width:100%;justify-content:center;}
+.seguir-wrap{margin-left:39px;animation:msgIn .42s both;}
+
+.btn{
+  position:relative;overflow:hidden;border:1px solid var(--line);background:#fff;color:var(--ink);
+  padding:10px 15px;border-radius:10px;font-size:12.5px;font-weight:500;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;
+  transition:transform .15s, border-color .15s, color .15s, box-shadow .15s, background .15s;
+}
+.btn svg{width:15px;height:15px;}
+.btn:hover{transform:translateY(-2px);border-color:var(--red);color:var(--red-dark);background:var(--red-tint);box-shadow:0 6px 16px rgba(0,0,0,.08);}
+.btn.primary{background:linear-gradient(135deg,var(--red),var(--red-dark));color:#fff;border:none;box-shadow:var(--glow);}
+.btn.primary:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(211,47,47,.45);color:#fff;}
+.btn::after{content:"";position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);transition:left .55s ease;pointer-events:none;}
+.btn:hover::after{left:140%;}
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.5);transform:scale(0);animation:ripple .6s linear;pointer-events:none;}
+
+/* Quick replies */
+.quick{display:flex;gap:8px;flex-wrap:wrap;margin-left:39px;animation:msgIn .42s both;}
+.q{font-size:12.5px;padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;transition:all .15s;}
+.q:hover{background:var(--red-tint);border-color:var(--red);color:var(--red-dark);transform:translateY(-1px);}
+
+/* Typing */
+.typing{display:flex;gap:4px;align-items:center;padding:4px 2px;}
+.typing i{width:7px;height:7px;border-radius:50%;background:rgba(211,47,47,.5);display:inline-block;animation:bounce 1.2s infinite;}
+.typing i:nth-child(2){animation-delay:.18s;} .typing i:nth-child(3){animation-delay:.36s;}
+
+/* Composer (colapsado hasta profundizar) */
+.composer{padding:0 16px;max-height:0;opacity:0;transform:translateY(16px);overflow:hidden;border-top:1px solid transparent;
+  transition:max-height .55s cubic-bezier(.2,.7,.3,1),opacity .45s ease,transform .45s ease,padding .4s ease,border-color .4s ease;}
+.composer.show{max-height:150px;opacity:1;transform:none;padding:12px 16px 16px;border-top-color:var(--line);}
+.composer-inner{display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:6px 6px 6px 16px;box-shadow:0 2px 8px rgba(0,0,0,.04);transition:border-color .15s, box-shadow .15s;}
+.composer-inner:focus-within{border-color:var(--red);box-shadow:0 0 0 3px var(--red-tint);}
+.composer input{flex:1;border:none;outline:none;background:transparent;font-size:14px;height:34px;color:var(--ink);}
+.composer input::placeholder{color:#b5b0b0;}
+.send{width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;flex-shrink:0;background:linear-gradient(135deg,var(--red),var(--red-dark));color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:var(--glow);transition:transform .15s, box-shadow .15s;}
+.send svg{width:19px;height:19px;}
+.send:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 10px 26px rgba(211,47,47,.5);}
+.send:active{transform:scale(.94);}
+
+@keyframes msgIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+@keyframes dropIn{from{opacity:0;transform:translateY(-12px);}to{opacity:1;transform:none;}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(239,159,39,.5);}70%{box-shadow:0 0 0 7px rgba(239,159,39,0);}100%{box-shadow:0 0 0 0 rgba(239,159,39,0);}}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4;}30%{transform:translateY(-5px);opacity:1;}}
+@keyframes ripple{to{transform:scale(3);opacity:0;}}
+.messages::-webkit-scrollbar{width:9px;}
+.messages::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:9px;border:2px solid transparent;background-clip:content-box;}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+
+<div class="stage">
+  <div class="panel">
+
+    <!-- Header -->
+    <div class="p-head">
+      <div class="brand-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">Big Tools · Asistente</div>
+        <div class="brand-status"><span class="live"></span> Hidrolavadora Kärcher</div>
+      </div>
+      <div class="spacer"></div>
+      <button class="icon-btn" title="Reiniciar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+    </div>
+
+    <!-- Contexto -->
+    <div class="context-bar">
+      <div class="context-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+      <div>
+        <div class="context-equipo">Hidrolavadora Kärcher</div>
+        <div class="context-falla">Diagnóstico: luz indicadora de combustible</div>
+      </div>
+    </div>
+
+    <!-- Mensajes -->
+    <div class="messages" id="messages">
+      <div id="inner" style="display:flex;flex-direction:column;gap:13px;">
+
+        <div class="row user"><div class="bubble">¿Cómo lo soluciono?</div></div>
+
+        <div class="row">
+          <div class="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/><path d="M2 14h2M20 14h2"/></svg></div>
+          <div class="diag-card">
+            <span class="sev"><span class="dot"></span> Severidad media</span>
+            <div class="diag-line"><span class="k">Causa:</span> depósito de combustible vacío.</div>
+            <div class="steps">
+              <div class="diag-line k" style="margin-bottom:2px;">Pasos:</div>
+              <div class="step"><span class="n">1.</span><span>Apagá el equipo y dejá enfriar el quemador.</span></div>
+              <div class="step"><span class="n">2.</span><span>Rellená el depósito con combustible limpio.</span></div>
+              <div class="step"><span class="n">3.</span><span>Reiniciá y verificá que la luz se apague.</span></div>
+            </div>
+            <div class="chips">
+              <span class="chip-src"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> Pág. 14</span>
+              <span class="chip-src"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> Pág. 31</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions-stack">
+          <div class="actions-row">
+            <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> Ver manual</button>
+            <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg> Exportar PDF</button>
+          </div>
+          <button class="btn primary btn-full" id="profundizar" onclick="profundizar()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg> Profundizar con IA</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Composer -->
+    <div class="composer" id="composer">
+      <div class="composer-inner">
+        <input id="msg" type="text" placeholder="Preguntá sobre este equipo…" onkeydown="if(event.key==='Enter')send()">
+        <button class="send" onclick="send()" aria-label="Enviar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ===== Partículas ===== */
+const cv=document.getElementById('particles'),cx=cv.getContext('2d');
+let W,H,parts;
+function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight;
+  const n=Math.min(64,Math.floor(W*H/24000));
+  parts=Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,
+    vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*2+.6,
+    a:Math.random()*.5+.15,red:Math.random()<.4}));}
+resize();addEventListener('resize',resize);
+function tick(){cx.clearRect(0,0,W,H);
+  for(let i=0;i<parts.length;i++){const p=parts[i];p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
+    cx.beginPath();cx.arc(p.x,p.y,p.r,0,7);
+    cx.fillStyle=p.red?`rgba(211,47,47,${p.a*.5})`:`rgba(90,90,100,${p.a*.4})`;cx.fill();
+    for(let j=i+1;j<parts.length;j++){const q=parts[j],dx=p.x-q.x,dy=p.y-q.y,d=dx*dx+dy*dy;
+      if(d<12000){cx.beginPath();cx.moveTo(p.x,p.y);cx.lineTo(q.x,q.y);
+        cx.strokeStyle=`rgba(140,120,120,${(1-d/12000)*.08})`;cx.lineWidth=1;cx.stroke();}}}
+  requestAnimationFrame(tick);}
+tick();
+
+/* ===== Ripple ===== */
+document.addEventListener('click',e=>{const b=e.target.closest('.btn');if(!b)return;
+  const r=document.createElement('span');r.className='ripple';
+  const rect=b.getBoundingClientRect(),s=Math.max(rect.width,rect.height);
+  r.style.width=r.style.height=s+'px';
+  r.style.left=(e.clientX-rect.left-s/2)+'px';r.style.top=(e.clientY-rect.top-s/2)+'px';
+  b.appendChild(r);setTimeout(()=>r.remove(),600);});
+
+/* ===== Chat ===== */
+const inner=document.getElementById('inner'),msgs=document.getElementById('messages');
+const ROBOT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/><path d="M2 14h2M20 14h2"/></svg>';
+function scrollDown(){msgs.scrollTop=msgs.scrollHeight;}
+function addUser(t){const d=document.createElement('div');d.className='row user';d.innerHTML=`<div class="bubble">${t}</div>`;inner.appendChild(d);scrollDown();}
+function addBot(t){const d=document.createElement('div');d.className='row';d.innerHTML=`<div class="avatar">${ROBOT}</div><div class="bubble">${t}</div>`;inner.appendChild(d);scrollDown();}
+function typing(){const d=document.createElement('div');d.className='row';d.id='typing';d.innerHTML=`<div class="avatar">${ROBOT}</div><div class="bubble"><div class="typing"><i></i><i></i><i></i></div></div>`;inner.appendChild(d);scrollDown();}
+const respuestas=["Necesitás un bidón de combustible limpio y un embudo. Nada más.","Revisá el nivel antes de cada uso prolongado; el manual lo recomienda en la pág. 14.","Si tras rellenar la luz sigue encendida, puede ser el sensor de nivel — avisame y lo vemos."];
+let ri=0;
+function ask(t){addUser(t);bot();}
+function send(){const i=document.getElementById('msg');const t=i.value.trim();if(!t)return;i.value='';addUser(t);bot();}
+function bot(){typing();setTimeout(()=>{document.getElementById('typing')?.remove();addBot(respuestas[ri%respuestas.length]);ri++;},1100);}
+
+/* ===== Flujo: profundizar → análisis → seguir consultando → chat ===== */
+function profundizar(){
+  const b=document.getElementById('profundizar');
+  if(b.dataset.done)return; b.dataset.done='1'; b.style.opacity='.5'; b.style.pointerEvents='none';
+  typing();
+  setTimeout(()=>{document.getElementById('typing')?.remove();addAnalisis();showSeguir();},1300);
+}
+function addAnalisis(){
+  const d=document.createElement('div');d.className='row';
+  d.innerHTML=`<div class="avatar">${ROBOT}</div>
+   <div class="diag-card">
+     <span class="sev" style="background:#e6f1fb;color:#185fa5;"><span class="dot" style="background:#378add;animation:none;"></span> Análisis técnico</span>
+     <div class="diag-line">El sensor de nivel corta el quemador como protección cuando el combustible baja del mínimo. No es una falla del equipo: una vez recargado es seguro operar.</div>
+     <div class="diag-line" style="margin-bottom:0;">Si la luz persiste tras recargar, revisá el flotante del sensor (pág. 32) antes de seguir usándolo.</div>
+   </div>`;
+  inner.appendChild(d);scrollDown();
+}
+function showSeguir(){
+  const w=document.createElement('div');w.className='seguir-wrap';w.id='seguir';
+  w.innerHTML=`<button class="btn primary btn-full" onclick="revealChat()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Seguir consultando sobre esto</button>`;
+  inner.appendChild(w);scrollDown();
+}
+function revealChat(){
+  document.getElementById('seguir')?.remove();
+  const q=document.createElement('div');q.className='quick';
+  q.innerHTML=`<span class="q" onclick="ask('¿Qué herramienta necesito?')">¿Qué herramienta necesito?</span><span class="q" onclick="ask('¿Cada cuánto reviso el depósito?')">¿Cada cuánto reviso el depósito?</span>`;
+  inner.appendChild(q);scrollDown();
+  document.getElementById('composer').classList.add('show');
+  setTimeout(()=>{document.getElementById('msg').focus();scrollDown();},350);
+}
+</script>
+</body>
+</html>

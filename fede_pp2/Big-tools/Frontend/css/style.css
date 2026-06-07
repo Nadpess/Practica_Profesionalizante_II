@@ -2016,6 +2016,90 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   REDISEÑO CHAT — header de contexto, burbujas, chips de fuentes, typing
+═══════════════════════════════════════════════════════════════════ */
+
+/* Header de contexto: equipo + falla diagnosticada (queda anclado arriba) */
+#main-container .rag-ctx-header {
+    position: sticky; top: 0; z-index: 6;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; margin: 0 0 6px;
+    background: var(--brand-tint, #fceaea);
+    border: 1px solid #f1c3c3;
+    border-radius: 12px;
+    animation: msgSlideIn .22s ease-out;
+}
+#main-container .rag-ctx-icon {
+    width: 30px; height: 30px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; border-radius: 50%; font-size: 1rem;
+    border: 1px solid #f1c3c3;
+}
+#main-container .rag-ctx-body { flex: 1; min-width: 0; }
+#main-container .rag-ctx-equipo {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: .82rem; color: var(--brand-dark, #8a1a1a); line-height: 1.2;
+}
+#main-container .rag-ctx-falla {
+    font-size: .74rem; color: #a13030; line-height: 1.3;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Burbuja del asistente con avatar a la izquierda */
+#main-container .rag-msg-row {
+    align-self: flex-start;
+    display: flex; gap: 8px; align-items: flex-start;
+    max-width: 92%;
+    background: none; border: none; box-shadow: none; padding: 0;
+    animation: msgSlideIn .22s ease-out;
+}
+#main-container .rag-avatar {
+    width: 30px; height: 30px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--brand-tint, #fceaea); border: 1px solid #f1c3c3;
+    border-radius: 50%; font-size: 1rem; margin-top: 2px;
+}
+#main-container .rag-msg-row .rag-respuesta {
+    flex: 1; min-width: 0; border-top-left-radius: 5px;
+}
+
+/* Chips de fuentes (reemplazan "Fuente: págs. X") */
+#main-container .rag-chips {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
+}
+#main-container .rag-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: .72rem; padding: 3px 9px;
+    background: var(--bg-soft, #f5f3f0); border: 1px solid var(--line, #e3e0db);
+    color: var(--ink-soft, #6a6760); border-radius: 999px;
+}
+
+/* Typing indicator más limpio */
+#main-container .rag-loading { display: flex; align-items: center; }
+#main-container .rag-loading-texto { color: var(--ink-soft, #6a6760); font-size: .82rem; }
+
+/* Avatar del asistente en TODO el flujo del sistema experto */
+#main-container .se-msg-row {
+    align-self: flex-start;
+    display: flex; gap: 8px; align-items: flex-start;
+    max-width: 88%;
+    animation: msgSlideIn .22s ease-out;
+}
+#main-container .se-avatar {
+    width: 30px; height: 30px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--brand-tint, #fceaea); border: 1px solid #f1c3c3;
+    border-radius: 50%; font-size: 1rem; margin-top: 2px;
+}
+#main-container .se-msg-row .message.bot {
+    max-width: 100%; align-self: stretch;
+    border-top-left-radius: 5px; box-shadow: none;
+    animation: none;
+}
+/* Botones de opción del SE alineados bajo la burbuja (debajo del avatar) */
+#main-container .bot-options { margin-left: 38px; }
+
+/* ═══════════════════════════════════════════════════════════════════
    REDISEÑO — Login y modal de confirmación (tema claro limpio)
 ═══════════════════════════════════════════════════════════════════ */
 .login-brand { background: var(--primary-color); }
@@ -2053,3 +2137,148 @@ body {
     background: var(--primary-color); box-shadow: none; border-radius: 10px;
 }
 .confirm-btn-ok:hover { background: var(--brand-dark); box-shadow: none; transform: none; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   FIX LAYOUT CHAT — centrado, header full-width, paleta rojo/blanco
+═══════════════════════════════════════════════════════════════════ */
+
+/* El contenedor del chat ocupa todo el alto y estira a sus hijos */
+#main-container { align-items: stretch; padding: 0; }
+
+/* Header como barra superior full-width (estilo orbit) */
+#main-container .header {
+    width: 100%; max-width: none; margin: 0; border-radius: 0;
+}
+
+/* La caja del chat deja de ser un recuadro blanco flotante */
+#main-container .chat-container {
+    width: 100%; max-width: none;
+    background: transparent; box-shadow: none; border-radius: 0;
+    flex: 1; display: flex; flex-direction: column; overflow: hidden;
+}
+
+/* La conversación se centra en una columna de ancho máximo */
+#main-container .chat-window {
+    width: 100%; max-width: 880px; margin: 0 auto; height: auto;
+}
+#main-container .ai-disclaimer {
+    width: 100%; max-width: 880px; margin: 4px auto 10px;
+}
+
+/* ── Botones e input: tema rojo/blanco (elimina restos azules) ────────── */
+#main-container .rag-input-container {
+    border: 1px solid var(--line); border-radius: 14px;
+    background: #fff; box-shadow: var(--shadow); padding: 14px;
+}
+#main-container .rag-textarea {
+    border: 1px solid var(--line); border-radius: 10px;
+    background: var(--bg-soft); color: var(--ink);
+}
+#main-container .rag-textarea:focus {
+    border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--brand-tint); background: #fff;
+}
+#main-container .rag-input-actions { gap: 8px; flex-wrap: wrap; }
+#main-container .rag-send-btn {
+    background: var(--primary-color); color: #fff; border: none;
+    border-radius: 9px; box-shadow: none; font-weight: 500; padding: 9px 18px;
+}
+#main-container .rag-send-btn:hover { background: var(--brand-dark); box-shadow: none; transform: none; }
+#main-container .rag-btn {
+    background: var(--primary-color); color: #fff; border: none;
+    box-shadow: none; border-radius: 10px;
+}
+#main-container .rag-btn:hover { background: var(--brand-dark); box-shadow: none; transform: none; }
+#main-container .rag-nueva-btn, #main-container .rag-cancel-btn {
+    background: #fff; border: 1px solid var(--line); color: var(--ink-soft);
+    border-radius: 9px; box-shadow: none; font-weight: 500; padding: 9px 14px;
+}
+#main-container .rag-nueva-btn:hover, #main-container .rag-cancel-btn:hover {
+    border-color: var(--primary-color); color: var(--brand-dark); background: #fff;
+}
+
+/* Botones de opción del SE: pills ordenadas y consistentes */
+#main-container .bot-options { gap: 8px; }
+#main-container .option-btn {
+    background: #fff; border: 1px solid var(--line); color: var(--ink);
+    border-radius: 10px; box-shadow: none; font-size: .85rem; padding: 10px 16px;
+}
+#main-container .option-btn:hover {
+    background: var(--brand-tint); border-color: var(--primary-color); color: var(--brand-dark); box-shadow: none;
+}
+
+/* Botones de acción post-diagnóstico (Ver Manual / Exportar PDF): secundarios y agrupados */
+#main-container .manual-button-container { margin: 6px 0 0 38px; }
+#main-container .manual-btn {
+    background: #fff; color: var(--ink); border: 1px solid var(--line);
+    border-radius: 9px; font-size: .82rem; font-weight: 500;
+    box-shadow: none; padding: 8px 14px;
+}
+#main-container .manual-btn:hover {
+    background: var(--brand-tint); border-color: var(--primary-color);
+    color: var(--brand-dark); transform: none; box-shadow: none;
+}
+
+/* Bloque "Profundizar con IA" indentado bajo la burbuja */
+#main-container .profundizar-wrapper { margin-left: 38px; }
+
+/* Avatar del asistente: círculo blanco limpio */
+#main-container .se-avatar, #main-container .rag-avatar {
+    background: #fff; border: 1px solid var(--line); font-size: .95rem;
+}
+
+/* Burbuja del bot más tipo chat (plana, sin sombra dura) */
+#main-container .se-msg-row .message.bot {
+    background: #fff; border: 1px solid var(--line); box-shadow: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PROTOTIPO B aplicado — panel de chat, tarjeta de diagnóstico, botones
+═══════════════════════════════════════════════════════════════════ */
+
+/* Panel de chat contenido (caja blanca centrada) */
+#main-container .chat-container { padding: 18px 16px; }
+#main-container .chat-window {
+    max-width: 780px; margin: 0 auto; width: 100%;
+    background: #faf8f8; border: 1px solid var(--line); border-radius: 18px;
+    box-shadow: var(--shadow); padding: 18px;
+}
+#main-container .ai-disclaimer { max-width: 780px; margin: 6px auto 0; }
+
+/* Tarjeta de diagnóstico (dentro de la fila con avatar) */
+#main-container .diag-card {
+    flex: 1; min-width: 0; background: #fff; border: 1px solid var(--line);
+    border-radius: 15px; border-top-left-radius: 5px; padding: 13px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04); transition: transform .2s, box-shadow .2s;
+}
+#main-container .diag-card:hover { transform: translateY(-2px); box-shadow: 0 16px 36px rgba(20,10,10,.10); }
+#main-container .diag-falla { font-size: .9rem; line-height: 1.5; margin-bottom: 10px; }
+#main-container .diag-k { font-weight: 600; color: var(--brand-dark); }
+#main-container .diag-sols-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin-bottom: 6px; }
+#main-container .diag-steps { display: flex; flex-direction: column; gap: 3px; }
+#main-container .diag-step { display: flex; gap: 8px; font-size: .88rem; line-height: 1.5; }
+#main-container .diag-n { color: var(--primary-color); font-weight: 700; flex-shrink: 0; }
+
+/* Acciones agrupadas: fila (ver manual + exportar) + botón full width */
+#main-container .actions-stack { display: flex; flex-direction: column; gap: 8px; margin: 6px 0 0 39px; }
+#main-container .actions-row { display: flex; gap: 8px; }
+#main-container .actions-row .btn-sec { flex: 1; }
+#main-container .seguir-wrap { margin: 6px 0 0 39px; animation: msgSlideIn .3s ease-out; }
+
+/* Botones con brillo (shine) + glow */
+#main-container .btn-sec, #main-container .btn-primary {
+    position: relative; overflow: hidden; border-radius: 10px; font-size: .82rem; font-weight: 500;
+    cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 10px 15px; font-family: inherit; text-decoration: none;
+    transition: transform .15s, box-shadow .15s, background .15s, border-color .15s, color .15s;
+}
+#main-container .btn-sec { background: #fff; border: 1px solid var(--line); color: var(--ink); }
+#main-container .btn-sec:hover { transform: translateY(-2px); border-color: var(--primary-color); color: var(--brand-dark); background: var(--brand-tint); box-shadow: 0 6px 16px rgba(0,0,0,.08); }
+#main-container .btn-primary { background: linear-gradient(135deg, var(--primary-color), var(--brand-dark)); color: #fff; border: none; box-shadow: 0 6px 20px rgba(211,47,47,.32); }
+#main-container .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(211,47,47,.45); color: #fff; }
+#main-container .btn-full { width: 100%; }
+#main-container .btn-sec::after, #main-container .btn-primary::after {
+    content: ""; position: absolute; top: 0; left: -120%; width: 60%; height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,.5), transparent);
+    transform: skewX(-20deg); transition: left .55s ease; pointer-events: none;
+}
+#main-container .btn-sec:hover::after, #main-container .btn-primary:hover::after { left: 140%; }

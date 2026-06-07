@@ -222,7 +222,7 @@ function _mostrarChat(callback) {
   setTimeout(() => {
     orbitEl.style.display = 'none';
     orbitEl.classList.remove('screen-exit');
-    chatEl.style.display  = 'block';
+    chatEl.style.display  = 'flex';
     void chatEl.offsetWidth;
     chatEl.classList.add('screen-enter');
     setTimeout(() => {
@@ -584,12 +584,46 @@ window.addEventListener('DOMContentLoaded', () => {
 // ========== MENSAJES Y OPCIONES ==========
 
 function addMessage(text, sender = "bot") {
+  // Mensajes del asistente: fila con avatar 🤖 + burbuja (rediseño aplicado a todo el flujo)
+  if (sender === "bot") {
+    const row = document.createElement("div");
+    row.classList.add("se-msg-row");
+    const avatar = document.createElement("div");
+    avatar.className = "se-avatar";
+    avatar.textContent = "🤖";
+    const bubble = document.createElement("div");
+    bubble.classList.add("message", "bot");
+    bubble.innerHTML = text;
+    row.appendChild(avatar);
+    row.appendChild(bubble);
+    chatWindow.appendChild(row);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+    return row;
+  }
   const messageDiv = document.createElement("div");
   messageDiv.classList.add("message", sender);
   messageDiv.innerHTML = text;
   chatWindow.appendChild(messageDiv);
   chatWindow.scrollTop = chatWindow.scrollHeight;
   return messageDiv;
+}
+
+/** Fila del asistente (avatar 🤖) con contenido custom, ej. la tarjeta de diagnóstico. */
+function _addBotCard(html) {
+  const row = document.createElement("div");
+  row.className = "se-msg-row";
+  const av = document.createElement("div");
+  av.className = "se-avatar";
+  av.textContent = "🤖";
+  const wrap = document.createElement("div");
+  wrap.style.flex = "1";
+  wrap.style.minWidth = "0";
+  wrap.innerHTML = html;
+  row.appendChild(av);
+  row.appendChild(wrap);
+  chatWindow.appendChild(row);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+  return row;
 }
 
 function addOptions(options, callback) {
@@ -676,7 +710,7 @@ async function mostrarInputRAG(nombreMaquina) {
       ></textarea>
       <div class="rag-input-actions">
         <button class="rag-send-btn" id="rag-send-btn">Consultar →</button>
-        <button class="rag-nueva-btn" id="rag-nueva-btn" title="Limpiar historial y empezar de cero">🔄 Nueva conv.</button>
+        <button class="rag-nueva-btn" id="rag-nueva-btn" title="Limpiar historial y empezar de cero">🔄 Reiniciar conversación</button>
         <button class="rag-cancel-btn" id="rag-cancel-btn">Volver al diagnóstico</button>
       </div>
     </div>
@@ -728,7 +762,7 @@ async function _streamConsultaRAG(nombreMaquina, pregunta, analisis = false, hea
       <span class="rag-loading-dot"></span>
       <span class="rag-loading-dot"></span>
       <span class="rag-loading-dot"></span>
-      <span id="rag-loading-texto" style="margin-left:8px; color:#666;">🔍 Buscando en el manual...</span>
+      <span id="rag-loading-texto" class="rag-loading-texto" style="margin-left:8px;">Buscando en el manual…</span>
     </div>
   `);
 
@@ -757,7 +791,12 @@ async function _streamConsultaRAG(nombreMaquina, pregunta, analisis = false, hea
 
     // ── Contenedor de streaming ───────────────────────────────────────────
     const streamContainer = document.createElement("div");
-    streamContainer.classList.add("message", "bot");
+    streamContainer.classList.add("rag-msg-row");
+
+    const avatar = document.createElement("div");
+    avatar.className = "rag-avatar";
+    avatar.textContent = "🤖";
+    streamContainer.appendChild(avatar);
 
     const ragRespuesta = document.createElement("div");
     ragRespuesta.classList.add("rag-respuesta");
@@ -797,15 +836,11 @@ async function _streamConsultaRAG(nombreMaquina, pregunta, analisis = false, hea
 
           if (ev.tipo === "meta") {
             if (ev.paginas?.length > 0) {
-              paginasEl.innerHTML =
-                `<div class="rag-paginas">📄 Fuente: págs. ${ev.paginas.join(", ")}</div>`;
+              paginasEl.innerHTML = _chipsFuentes(ev.paginas);
             }
             if (ev.secciones?.length > 0) {
               paginasEl.innerHTML +=
                 `<div class="rag-secciones">📑 ${ev.secciones.join(" · ")}</div>`;
-            }
-            if (ev.confianza !== undefined) {
-              paginasEl.innerHTML += _badgeConfianza(ev.confianza);
             }
             if (ev.desde_cache) {
               esDesdeCache = true;
@@ -815,7 +850,7 @@ async function _streamConsultaRAG(nombreMaquina, pregunta, analisis = false, hea
           } else if (ev.tipo === "inicio_stream") {
             // Actualizar texto del loading — todavía visible
             const textoEl = document.getElementById("rag-loading-texto");
-            if (textoEl) textoEl.textContent = "✍️ Escribiendo respuesta...";
+            if (textoEl) textoEl.textContent = "Redactando la respuesta…";
 
           } else if (ev.tipo === "token") {
             // Primer token: recién ahora sacamos el loading
@@ -836,7 +871,7 @@ async function _streamConsultaRAG(nombreMaquina, pregunta, analisis = false, hea
             if (ragRespuesta._respuestaCompleta && !esDesdeCache) {
               _agregarBotonesFeedback(paginasEl, nombreMaquina, preguntaOriginal, ragRespuesta);
             }
-            if (onFin) await onFin();
+            if (onFin) await onFin(fullText);
             else _mostrarOpcionesPostRAG(nombreMaquina);
           }
         } catch (_) { /* línea SSE malformada, ignorar */ }
@@ -882,7 +917,7 @@ function _agregarBotonesFeedback(paginasEl, maquina, pregunta, ragRespuesta) {
           pregunta,
           respuesta: ragRespuesta._respuestaCompleta || '',
           positivo,
-          confianza: parseInt(paginasEl.querySelector('.confidence-badge')?.textContent?.match(/\d+/)?.[0] || '75'),
+          confianza: 75,
           paginas:   [],
           secciones: [],
         })
@@ -900,20 +935,6 @@ function _agregarBotonesFeedback(paginasEl, maquina, pregunta, ragRespuesta) {
 // Las máquinas sin árbol de conocimiento ahora usan consulta libre RAG
 // directamente desde handleMachineSelection.
 
-/**
- * Genera el HTML del badge de confianza según el score (0-100).
- */
-function _badgeConfianza(score) {
-  let clase, etiqueta;
-  if (score >= 75) {
-    clase = "confianza-alta";   etiqueta = `✅ Confianza alta (${score}%)`;
-  } else if (score >= 45) {
-    clase = "confianza-media";  etiqueta = `⚠️ Confianza media (${score}%)`;
-  } else {
-    clase = "confianza-baja";   etiqueta = `❓ Confianza baja (${score}%) — revisá el manual`;
-  }
-  return `<div class="rag-confianza ${clase}">${etiqueta}</div>`;
-}
 
 /**
  * Formatea el texto de respuesta RAG para renderizado HTML.
@@ -940,12 +961,12 @@ const _SALUDOS = /^(hola|hello|hi|buenas|buen día|buen dia|buenas tardes|buenas
 // ── Sesión conversacional RAG ─────────────────────────────────────────────────
 let _ragSessionId = null;   // null = sin sesión activa
 
-async function _iniciarSesionRAG(nombreMaquina) {
+async function _iniciarSesionRAG(nombreMaquina, contexto = "") {
   try {
     const res = await fetch(`${API_URL}/rag/sesion`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nombre_maquina: nombreMaquina })
+      body: JSON.stringify({ nombre_maquina: nombreMaquina, contexto })
     });
     const data = await res.json();
     _ragSessionId = data.session_id;
@@ -953,6 +974,38 @@ async function _iniciarSesionRAG(nombreMaquina) {
     _ragSessionId = null;
     console.warn("No se pudo crear sesión RAG:", e);
   }
+}
+
+/** Muestra (o actualiza) el header de contexto del chat: equipo + falla diagnosticada. */
+function _mostrarHeaderContexto(nombreMaquina, falla = "") {
+  document.getElementById("rag-ctx-header")?.remove();
+  const h = document.createElement("div");
+  h.className = "rag-ctx-header";
+  h.id = "rag-ctx-header";
+  h.innerHTML = `
+    <span class="rag-ctx-icon">🛠️</span>
+    <div class="rag-ctx-body">
+      <div class="rag-ctx-equipo">${nombreMaquina}</div>
+      ${falla ? `<div class="rag-ctx-falla" title="${falla}">Diagnóstico: ${falla}</div>` : ""}
+    </div>
+  `;
+  chatWindow.appendChild(h);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+/** Genera el HTML de los chips de páginas-fuente. */
+function _chipsFuentes(paginas) {
+  if (!paginas?.length) return "";
+  const chips = paginas.map(p => `<span class="rag-chip">📄 Pág. ${p}</span>`).join("");
+  return `<div class="rag-chips">${chips}</div>`;
+}
+
+/** Abre un chat libre ANCLADO al diagnóstico previo (síntoma/causa/solución del SE). */
+async function iniciarChatContextual(nombreMaquina, contexto, falla = "") {
+  _mostrarHeaderContexto(nombreMaquina, falla);
+  addMessage("💬 Ahora podés preguntar libremente sobre este equipo — la IA tiene presente el diagnóstico.");
+  await _iniciarSesionRAG(nombreMaquina, contexto || "");
+  await mostrarInputRAG(nombreMaquina);
 }
 
 async function _limpiarSesionRAG() {
@@ -973,7 +1026,7 @@ async function _streamConsultaConversacional(nombreMaquina, pregunta, onFin = nu
       <span class="rag-loading-dot"></span>
       <span class="rag-loading-dot"></span>
       <span class="rag-loading-dot"></span>
-      <span id="rag-loading-texto" style="margin-left:8px; color:#666;">🔍 Buscando en el manual...</span>
+      <span id="rag-loading-texto" class="rag-loading-texto" style="margin-left:8px;">Buscando en el manual…</span>
     </div>
   `);
 
@@ -1002,7 +1055,11 @@ async function _streamConsultaConversacional(nombreMaquina, pregunta, onFin = nu
 
     // Contenedor de respuesta
     const streamContainer = document.createElement("div");
-    streamContainer.classList.add("message", "bot");
+    streamContainer.classList.add("rag-msg-row");
+    const avatar = document.createElement("div");
+    avatar.className = "rag-avatar";
+    avatar.textContent = "🤖";
+    streamContainer.appendChild(avatar);
     const ragRespuesta = document.createElement("div");
     ragRespuesta.classList.add("rag-respuesta");
     ragRespuesta.innerHTML = `
@@ -1038,17 +1095,14 @@ async function _streamConsultaConversacional(nombreMaquina, pregunta, onFin = nu
 
           if (ev.tipo === "meta") {
             if (ev.paginas?.length > 0) {
-              paginasEl.innerHTML = `<div class="rag-paginas">📄 Fuente: págs. ${ev.paginas.join(", ")}</div>`;
+              paginasEl.innerHTML = _chipsFuentes(ev.paginas);
             }
             if (ev.secciones?.length > 0) {
               paginasEl.innerHTML += `<div class="rag-secciones">📑 ${ev.secciones.join(" · ")}</div>`;
             }
-            if (ev.confianza !== undefined) {
-              paginasEl.innerHTML += _badgeConfianza(ev.confianza);
-            }
           } else if (ev.tipo === "inicio_stream") {
             const textoEl = document.getElementById("rag-loading-texto");
-            if (textoEl) textoEl.textContent = "✍️ Escribiendo respuesta...";
+            if (textoEl) textoEl.textContent = "Redactando la respuesta…";
           } else if (ev.tipo === "token") {
             if (!loadingRemoved) { loadingMsg.remove(); loadingRemoved = true; }
             fullText += ev.texto;
@@ -1129,7 +1183,7 @@ async function enviarConsultaRAG(nombreMaquina) {
  * @param {string} nombreMaquina
  * @param {string} falla  - descripción de la falla detectada por el sistema experto
  */
-async function profundizarConIA(nombreMaquina, falla) {
+async function profundizarConIA(nombreMaquina, falla, contexto = "") {
   const pregunta = `Analizá en detalle la siguiente falla detectada en ${nombreMaquina}: "${falla}". `
     + `Explicá la causa técnica, el nivel de gravedad, si es seguro seguir operando, `
     + `y los pasos concretos para solucionar el problema según el manual.`;
@@ -1143,8 +1197,32 @@ async function profundizarConIA(nombreMaquina, falla) {
     nombreMaquina,
     pregunta,
     true,  // modo_analisis activo
-    "🤖 Análisis técnico del manual"
+    "🤖 Análisis técnico del manual",
+    async (ampliacion) => {
+      // El chat contextual toma AMBAS cosas: el diagnóstico del SE + lo que amplió la IA.
+      const ctxBase = contexto || `Equipo: ${nombreMaquina}. Falla: ${falla}.`;
+      const resumenAmpliacion = (ampliacion || "").slice(0, 1200);  // acotado p/ no saturar contexto
+      const ctxFull = ctxBase + (resumenAmpliacion ? `\n\nAnálisis ampliado por la IA:\n${resumenAmpliacion}` : "");
+      // No abrimos el input directo: mostramos el botón "Empezar a chatear".
+      _mostrarBotonEmpezarChat(nombreMaquina, ctxFull, falla);
+    }
   );
+}
+
+/** Botón intermedio tras la profundización: recién al tocarlo se abre el chat libre. */
+function _mostrarBotonEmpezarChat(maquina, ctxFull, falla) {
+  const w = document.createElement("div");
+  w.className = "seguir-wrap";
+  const b = document.createElement("button");
+  b.className = "btn-primary btn-full";
+  b.innerHTML = "💬 Empezar a chatear sobre este equipo";
+  b.addEventListener("click", () => {
+    w.remove();
+    iniciarChatContextual(maquina, ctxFull, falla);
+  });
+  w.appendChild(b);
+  chatWindow.appendChild(w);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
 /**
@@ -1193,56 +1271,70 @@ function handleApiResponse(response) {
     addOptions(response.opciones, handleOptionSelection);
   }
   else if (response.falla && response.soluciones) {
-    let solHTML = `<strong>Falla detectada:</strong> ${response.falla}<br>`;
-    solHTML += "<strong>Soluciones sugeridas:</strong><ul>";
-    response.soluciones.forEach((sol) => {
-      solHTML += `<li>${sol}</li>`;
-    });
-    solHTML += "</ul>";
+    const maquinaActual = response.maquina || sessionState.maquina;
 
-    if (response.referencia) {
-      solHTML += `<br><em>(Ref: ${response.referencia})</em>`;
-    }
-
-    addMessage(solHTML);
-
-    if (response.referencia && response.maquina) {
-      const manualBtn = crearBotonManual(response.maquina, response.referencia);
-      if (manualBtn) chatWindow.appendChild(manualBtn);
-    }
+    // ── Tarjeta de diagnóstico ───────────────────────────────────────────
+    const solsHTML = response.soluciones
+      .map(s => `<div class="diag-step"><span class="diag-n">›</span><span>${s}</span></div>`)
+      .join("");
+    const cardHTML = `
+      <div class="diag-card">
+        <div class="diag-falla"><span class="diag-k">Falla detectada:</span> ${response.falla}</div>
+        <div class="diag-sols-label">Soluciones sugeridas</div>
+        <div class="diag-steps">${solsHTML}</div>
+        ${response.referencia ? `<div class="rag-chips"><span class="rag-chip">📄 ${response.referencia}</span></div>` : ""}
+      </div>`;
+    _addBotCard(cardHTML);
 
     const diagnosticoData = {
-      maquina: response.maquina || sessionState.maquina,
+      maquina: maquinaActual,
       categoria: sessionState.categoria,
       falla: response.falla,
       solucion: response.soluciones.join('. ')
     };
-    const pdfBtn = crearBotonExportarPDF(diagnosticoData);
-    chatWindow.appendChild(pdfBtn);
 
-    // ── Botón "Profundizar con IA" ────────────────────────────────────────
-    const maquinaActual = response.maquina || sessionState.maquina;
+    // ── Acciones agrupadas: Ver manual + Exportar (fila) / Profundizar (full) ──
+    const stack = document.createElement("div");
+    stack.className = "actions-stack";
+    const row = document.createElement("div");
+    row.className = "actions-row";
+
+    if (response.referencia) {
+      const a = document.createElement("a");
+      a.href = `/manuales/${encodeURIComponent(response.referencia)}`;
+      a.target = "_blank";
+      a.className = "btn-sec";
+      a.innerHTML = `📄 Ver manual`;
+      row.appendChild(a);
+    }
+    const exp = document.createElement("button");
+    exp.className = "btn-sec";
+    exp.innerHTML = `⬇️ Exportar PDF`;
+    exp.addEventListener("click", () => exportarDiagnosticoPDF(diagnosticoData));
+    row.appendChild(exp);
+    stack.appendChild(row);
+
     if (maquinaActual && response.falla) {
-      const profundizarWrapper = document.createElement("div");
-      profundizarWrapper.classList.add("profundizar-wrapper");
-      profundizarWrapper.innerHTML = `
-        <div class="profundizar-hint">
-          ¿Querés que la IA analice esta falla en profundidad usando el manual?
-        </div>
-        <button class="profundizar-btn" id="btn-profundizar-ia">
-          🔍 Profundizar con IA
-        </button>
-      `;
-      chatWindow.appendChild(profundizarWrapper);
-      chatWindow.scrollTop = chatWindow.scrollHeight;
+      const _sols = (response.soluciones || []).join(" ");
+      const contextoDiag =
+        `Equipo: ${maquinaActual}. `
+        + (sessionState.categoria ? `Categoría: ${sessionState.categoria}. ` : "")
+        + `Falla diagnosticada: ${response.falla}. `
+        + (_sols ? `Solución indicada: ${_sols}` : "");
 
-      document.getElementById("btn-profundizar-ia").addEventListener("click", () => {
-        profundizarWrapper.remove();
-        profundizarConIA(maquinaActual, response.falla);
+      const prof = document.createElement("button");
+      prof.className = "btn-primary btn-full";
+      prof.id = "btn-profundizar-ia";
+      prof.innerHTML = `🔍 Profundizar con IA`;
+      prof.addEventListener("click", () => {
+        stack.remove();
+        profundizarConIA(maquinaActual, response.falla, contextoDiag);
       });
+      stack.appendChild(prof);
     }
 
-    addOptions(["Consultar otra maquina"], startChat);
+    chatWindow.appendChild(stack);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
   }
   else {
     addMessage(response.mensaje || "Error inesperado en la respuesta.");
@@ -1260,6 +1352,7 @@ async function startChat() {
 
 async function handleMachineSelection(machine) {
   sessionState.maquina = machine;
+  document.getElementById("rag-ctx-header")?.remove();  // limpiar header de contexto al ir al diagnóstico
 
   try {
     const response = await fetch(`${API_URL}/categorias/${machine}`);
@@ -1346,27 +1439,15 @@ async function handleOptionSelection(respuesta) {
 // ========== EXPORTAR PDF (sin cambios) ==========
 
 function crearBotonManual(maquina, referencia) {
-  const manualesMap = {
-    "hidrolavadora_karcher": "HIDROLAVADORA.pdf",
-    "generador_generac": "Generac_Manual_Usuario_Guardian_Series (1).pdf",
-    "motor_cummins": "MANUAL CUMMINS 2.pdf",
-    "soldadora_miller_ranger": "ranger_305d.pdf"
-  };
-
-  const nombreTecnico = maquina.toLowerCase()
-    .replace(/ /g, '_')
-    .replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i')
-    .replace(/ó/g, 'o').replace(/ú/g, 'u').replace(/ñ/g, 'n')
-    .replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u');
-
-  const archivoManual = manualesMap[nombreTecnico];
-  if (!archivoManual) return null;
+  // 'referencia' ya es el nombre del PDF (viene de la hoja del árbol), así que
+  // se usa directo: funciona para cualquier máquina, sin mapa hardcodeado.
+  if (!referencia) return null;
 
   const container = document.createElement("div");
   container.classList.add("manual-button-container");
 
   const btn = document.createElement("a");
-  btn.href = `/manuales/${encodeURIComponent(archivoManual)}`;
+  btn.href = `/manuales/${encodeURIComponent(referencia)}`;
   btn.target = "_blank";
   btn.classList.add("manual-btn");
   btn.innerHTML = `📄 Ver Manual (${referencia})`;
@@ -1381,7 +1462,6 @@ function crearBotonExportarPDF(data) {
 
   const btn = document.createElement("button");
   btn.classList.add("manual-btn");
-  btn.style.backgroundColor = "#2e7d32";
   btn.innerHTML = "⬇️ Exportar diagnóstico PDF";
   btn.addEventListener("click", () => exportarDiagnosticoPDF(data));
 

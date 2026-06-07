@@ -894,3 +894,25 @@ body { background-color: var(--bg-soft); color: var(--ink); }
 }
 .manual-btn { border-radius: 9px; font-weight: 500; }
 
+/* Botón y modal de generación de árbol */
+.manual-btn.arbol { background: #7c4dff; color: #fff; }
+.manual-btn.arbol:hover { background: #6a3fe0; }
+
+.arbol-overlay { position: fixed; inset: 0; background: rgba(10,8,8,.5); z-index: 600; display: flex; align-items: center; justify-content: center; }
+.arbol-panel { background: #fff; border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); width: min(760px, 92vw); max-height: 88vh; display: flex; flex-direction: column; padding: 20px 22px; }
+.arbol-head { display: flex; align-items: center; justify-content: space-between; }
+#arbol-titulo { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; color: var(--ink); }
+.arbol-close { border: 1px solid var(--line); background: #fff; border-radius: 8px; width: 30px; height: 30px; cursor: pointer; color: var(--ink-soft); }
+.arbol-close:hover { border-color: var(--primary-color); color: var(--brand-dark); }
+.arbol-msg { font-size: .9rem; color: var(--brand-dark); margin: 10px 0 2px; }
+.arbol-hint { font-size: .8rem; color: var(--ink-soft); margin: 0 0 10px; }
+.arbol-json { flex: 1; min-height: 320px; width: 100%; resize: vertical; font-family: 'Courier New', monospace; font-size: .8rem; line-height: 1.5; border: 1px solid var(--line); border-radius: 10px; padding: 12px; color: var(--ink); background: var(--bg-soft); outline: none; }
+.arbol-json:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--brand-tint); }
+.arbol-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
+.manual-btn.arbol-aprobar { background: var(--primary-color); color: #fff; }
+.manual-btn.arbol-aprobar:hover { background: var(--brand-dark); }
+
+.arbol-progreso-wrap { margin: 6px 0 10px; }
+.arbol-progreso-track { height: 10px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.arbol-progreso-bar { height: 100%; width: 0; background: var(--primary-color); border-radius: 999px; transition: width .4s ease; }
+

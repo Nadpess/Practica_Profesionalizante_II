@@ -1,57 +1,46 @@
 """
-Limpieza de manuales/colecciones de PRUEBA (aprobado por Fede, 2026-05-28).
+Limpieza: borra los PDFs y las colecciones de ChromaDB que YA NO corresponden a
+los manuales actuales (según data/manuales.json). Deja solo lo vigente.
 
-Elimina:
-  - Colecciones ChromaDB: prueba_comp, compresor_de_prueba (+ sus caches).
-  - El PDF Prueba_Comp.pdf.
-  - La entrada "Prueba Comp" en manuales.json.
-NO toca el manual real "Compresor".
+IMPORTANTE: correr con el backend (uvicorn) APAGADO, para que no haya otro
+proceso usando la base de ChromaDB.
 
 Uso (desde la carpeta Backend/, con el venv activado):
     python limpiar_colecciones.py
 """
 import json
 import os
-from api.rag import get_cliente_chroma
+from api.rag import get_cliente_chroma, normalizar_nombre_coleccion
 
-COLS_BORRAR = [
-    "prueba_comp", "compresor_de_prueba",
-    "cache__prueba_comp", "cache__compresor_de_prueba",
-]
-MANUALES_BORRAR = ["Prueba Comp"]
-PDF_DIR       = "data/manuales_pdf"
-MANUALES_JSON = "data/manuales.json"
+DATA   = "data"
+PDFDIR = os.path.join(DATA, "manuales_pdf")
 
+manuales = json.load(open(os.path.join(DATA, "manuales.json"), encoding="utf8"))
+nombres  = [m["nombre"] for m in manuales]
+archivos = set(m["archivo"] for m in manuales)
 
-def main():
-    cli = get_cliente_chroma()
-    existentes = {c.name for c in cli.list_collections()}
-    for c in COLS_BORRAR:
-        if c in existentes:
-            cli.delete_collection(c)
-            print(f"[chroma] borrada coleccion: {c}")
-        else:
-            print(f"[chroma] no existe (ok): {c}")
+# Colecciones válidas = la de cada manual vigente + su caché
+validas = set()
+for n in nombres:
+    c = normalizar_nombre_coleccion(n)
+    validas.add(c)
+    validas.add("cache__" + c)
 
-    with open(MANUALES_JSON, encoding="utf-8") as f:
-        manuales = json.load(f)
+print("=== Colecciones ChromaDB ===")
+cli = get_cliente_chroma()
+for col in cli.list_collections():
+    if col.name in validas:
+        print("  conservada:", col.name)
+    else:
+        cli.delete_collection(col.name)
+        print("  BORRADA:   ", col.name)
 
-    quedan = []
-    for m in manuales:
-        if m["nombre"] in MANUALES_BORRAR:
-            ruta = os.path.join(PDF_DIR, m["archivo"])
-            if os.path.exists(ruta):
-                os.remove(ruta)
-                print(f"[pdf] borrado: {m['archivo']}")
-            print(f"[manuales.json] quitado: {m['nombre']}")
-        else:
-            quedan.append(m)
+print("\n=== PDFs en manuales_pdf ===")
+for f in sorted(os.listdir(PDFDIR)):
+    if f in archivos:
+        print("  conservado:", f)
+    else:
+        os.remove(os.path.join(PDFDIR, f))
+        print("  BORRADO:   ", f)
 
-    with open(MANUALES_JSON, "w", encoding="utf-8") as f:
-        json.dump(quedan, f, ensure_ascii=False, indent=2)
-
-    print("Listo. Reinicia el backend para recargar la lista de maquinas.")
-
-
-if __name__ == "__main__":
-    main()
+print("\nListo. Reinicia uvicorn y reindexá los manuales desde el panel admin.")
