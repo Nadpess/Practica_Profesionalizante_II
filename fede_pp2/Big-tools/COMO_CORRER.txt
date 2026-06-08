@@ -2,27 +2,44 @@
   BIG TOOLS — COMO CORRER
 ==========================
 
+REQUISITOS PREVIOS
+------------------
+- Python 3.10+   (https://www.python.org/  -> marcar "Add Python to PATH")
+- Ollama         (https://ollama.com)
+- GPU recomendada (~4 GB de VRAM). Funciona en CPU, pero mas lento.
+
+
+FORMA FACIL (Windows)
+---------------------
+1. Doble clic en  setup.bat    (instala todo, una sola vez)
+2. Doble clic en  iniciar.bat  (levanta el sistema)
+
+El resto de este archivo es el paso a paso manual.
+
+
 1. INSTALAR DEPENDENCIAS
 ------------------------
 Abrir terminal en la carpeta del proyecto y correr:
 
-    cd Backend
-    pip install -r ../requirements.txt
+    python -m venv venv
+    venv\Scripts\activate        (Windows)
+    pip install -r requirements.txt
 
 
-2. TENER OLLAMA CORRIENDO
---------------------------
+2. TENER OLLAMA CORRIENDO Y BAJAR LOS MODELOS
+---------------------------------------------
 Ollama tiene que estar activo antes de levantar el servidor.
-Si no tenés los modelos, bajarlos una sola vez:
+Bajar los modelos una sola vez:
 
-    ollama pull llama3.2:3b
-    ollama pull nomic-embed-text
+    ollama pull qwen2.5:3b         (conversacion / diagnostico en tiempo real)
+    ollama pull qwen2.5:7b         (generacion automatica del arbol)
+    ollama pull nomic-embed-text   (embeddings para la busqueda en los manuales)
 
 
 3. LEVANTAR EL SERVIDOR
 ------------------------
     cd Backend
-    uvicorn app:app --reload
+    uvicorn app:app
 
 Abrir en el navegador: http://localhost:8000
 
@@ -33,7 +50,15 @@ Abrir en el navegador: http://localhost:8000
     tecnico / 1234    (acceso al sistema)
 
 
-5. INDEXAR MANUALES (primera vez o cuando se re-indexa)
+5. MANUALES (IMPORTANTE)
+------------------------
+Los PDF van en  Backend/data/manuales_pdf/  con los nombres EXACTOS que
+figuran en  Backend/data/manuales.json  (ej. Hidrolavadora_Karcher.pdf).
+Si esa carpeta esta vacia o los nombres no coinciden, la indexacion va a
+decir "archivo no encontrado".
+
+
+6. INDEXAR MANUALES (primera vez o cuando se re-indexa)
 --------------------------------------------------------
 - Entrar como admin
 - Ir a Panel de administracion > tab RAG
@@ -41,4 +66,4 @@ Abrir en el navegador: http://localhost:8000
 - Esperar que llegue al 100%
 
 NOTA: el vectorstore se genera localmente y NO esta en el repo.
-Cada maquina que corra el proyecto tiene que indexar los manuales.
+Cada maquina que corra el proyecto tiene que indexar los manuales una vez.

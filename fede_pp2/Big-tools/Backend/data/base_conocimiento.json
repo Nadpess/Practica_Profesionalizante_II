@@ -1107,5 +1107,85 @@
   },
   "secador_de_aire_dmd": {
     "categorias": []
+  },
+  "manual_de_prueba": {
+    "categorias": [
+      {
+        "categoria": "El compresor funciona sin parar",
+        "falla": "Demanda del sistema por encima de la capacidad del compresor",
+        "soluciones": [
+          "Cambiar el tamaño del compresor"
+        ],
+        "referencia": "Manual_de_prueba.pdf"
+      },
+      {
+        "categoria": "Fugas",
+        "falla": "Inspeccione su compresor, conexiones y red de aire.",
+        "soluciones": [
+          "Localízalas y soluciónelas"
+        ],
+        "referencia": "Manual_de_prueba.pdf"
+      },
+      {
+        "categoria": "Sin entrada de aire",
+        "falla": "Póngase en contacto con el asistente técnico autorizado más cercano",
+        "soluciones": [],
+        "referencia": "Manual_de_prueba.pdf"
+      },
+      {
+        "categoria": "Instalación eléctrica incorrecta",
+        "falla": "Ver capítulo instalación eléctrica",
+        "soluciones": [],
+        "referencia": "Manual_de_prueba.pdf"
+      },
+      {
+        "categoria": "La presión del depósito aumenta rápidamente u ocurren arranques con mucha frecuencia",
+        "falla": "Exceso de agua en el depósito.",
+        "soluciones": [
+          "Drene el depósito a través de la trampa"
+        ],
+        "referencia": "Manual_de_prueba.pdf"
+      },
+      {
+        "categoria": "Alta temperatura del aire comprimido",
+        "falla": "Acumulación de polvo / tinta en el compresor.",
+        "soluciones": [
+          "Limpie el compresor externamente"
+        ],
+        "referencia": "Manual_de_prueba.pdf"
+      },
+      {
+        "categoria": "Elemento filtrante bloqueado",
+        "falla": "Reemplácelo.",
+        "soluciones": [],
+        "referencia": "Manual_de_prueba.pdf"
+      },
+      {
+        "categoria": "Temperatura ambiente elevada",
+        "falla": "Mejore las condiciones de instalación.",
+        "soluciones": [],
+        "referencia": "Manual_de_prueba.pdf"
+      },
+      {
+        "categoria": "Salida de aire del compresor demasiado cerca del depósito",
+        "falla": "Use una manguera de aire más larga.",
+        "soluciones": [],
+        "referencia": "Manual_de_prueba.pdf"
+      },
+      {
+        "categoria": "Consumo excesivo de aceite lubricante",
+        "falla": "Es común que el compresor consuma más aceite en las primeras 200 horas de servicio o 2 meses, hasta que los anillos estén asentados.",
+        "soluciones": [],
+        "referencia": "Manual_de_prueba.pdf"
+      },
+      {
+        "categoria": "Desgaste prematuro de los componentes internos de la unidad compresora",
+        "falla": "Operando en un ambiente agresivo.",
+        "soluciones": [
+          "Cambiar componentes usando SAP. Mejore las condiciones locales"
+        ],
+        "referencia": "Manual_de_prueba.pdf"
+      }
+    ]
   }
 }

@@ -65,5 +65,6 @@ config.local.json
 
 # RAG — datos generados localmente (no subir al repo)
 Backend/data/vectorstore/
-Backend/data/manuales_pdf/
 Backend/data/tokens.json
+# NOTA: los PDF de manuales SÍ se versionan, para que viajen con el repo
+# y la indexación los encuentre en cualquier PC (Backend/data/manuales_pdf/).

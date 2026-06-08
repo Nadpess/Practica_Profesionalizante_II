@@ -1,5 +1,5 @@
 {
-  "total_diagnosticos": 234,
+  "total_diagnosticos": 236,
   "diagnosticos_por_maquina": {
     "generador_generac": 49,
     "motor_cummins": 56,
@@ -12,7 +12,8 @@
     "compresor_de_prueba": 2,
     "motosoldadora_ranger": 3,
     "generador_cummins": 4,
-    "compresor_sullair": 7
+    "compresor_sullair": 8,
+    "manual_de_prueba": 1
   },
   "diagnosticos_por_categoria": {
     "generador_generac|Problemas con luces LED o alarmas": 36,
@@ -49,29 +50,16 @@
     "hidrolavadora_karcher|Luz indicadora del motor": 1,
     "motosoldadora_ranger|Batería y Alternador": 1,
     "motosoldadora_ranger|Potencia de soldadura y Arco eléctrico": 1,
-    "compresor_sullair|El compresor no arranca": 2,
+    "compresor_sullair|El compresor no arranca": 3,
     "compresor_sullair|El compresor se apaga teniendo demanda de aire": 1,
     "compresor_sullair|Consumo excesivo de fluido del compresor": 2,
     "hidrolavadora_karcher|Luz indicadora de combustible": 1,
     "generador_cummins|Fallo de parada": 1,
     "compresor_sullair|Presencia de agua en los conductos de aire comprimido": 2,
-    "generador_cummins|Entrada configurable #2, 13 y 14": 1
+    "generador_cummins|Entrada configurable #2, 13 y 14": 1,
+    "manual_de_prueba|Salida de aire del compresor demasiado cerca del depósito": 1
   },
   "historial": [
-    {
-      "timestamp": "2025-11-12T17:11:27.406331",
-      "maquina": "hidrolavadora_karcher",
-      "categoria": "Una luz parpadea",
-      "completado": true,
-      "falla": "Fallo en la alimentación de tensión"
-    },
-    {
-      "timestamp": "2025-11-12T18:23:57.089567",
-      "maquina": "hidrolavadora_karcher",
-      "categoria": "Una luz parpadea",
-      "completado": true,
-      "falla": "Polos del enchufe invertidos"
-    },
     {
       "timestamp": "2025-11-12T18:24:34.820284",
       "maquina": "hidrolavadora_karcher",
@@ -406,9 +394,23 @@
       "categoria": "Consumo excesivo de fluido del compresor",
       "completado": true,
       "falla": "Tuberías o cedazos de retorno obstruidos."
+    },
+    {
+      "timestamp": "2026-06-07T19:41:43.957119",
+      "maquina": "compresor_sullair",
+      "categoria": "El compresor no arranca",
+      "completado": true,
+      "falla": "Fusible del circuito o de línea fundido."
+    },
+    {
+      "timestamp": "2026-06-07T19:58:48.444159",
+      "maquina": "manual_de_prueba",
+      "categoria": "Salida de aire del compresor demasiado cerca del depósito",
+      "completado": true,
+      "falla": "Use una manguera de aire más larga."
     }
   ],
-  "total_consultas_rag": 126,
+  "total_consultas_rag": 130,
   "consultas_rag_por_maquina": {
     "Motor Cummins": 10,
     "manual_cummins_2": 27,
@@ -419,6 +421,8 @@
     "hidrolavadora_karcher": 3,
     "motor_cummins": 3,
     "generador_cummins": 3,
-    "compresor_sullair": 11
+    "compresor_sullair": 12,
+    "Manual de prueba": 2,
+    "manual_de_prueba": 1
   }
 }
