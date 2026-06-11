@@ -212,6 +212,18 @@ function actualizarEstadisticas(stats) {
   const totalRAGEl = document.getElementById("total-rag");
   if (totalRAGEl) totalRAGEl.textContent = stats.total_consultas_rag || 0;
 
+  // Satisfacción de respuestas RAG (feedback 👍/👎)
+  const satEl  = document.getElementById("rag-satisfaccion");
+  const satDet = document.getElementById("rag-feedback-detalle");
+  const fbPos  = stats.rag_feedback_pos || 0;
+  const fbNeg  = stats.rag_feedback_neg || 0;
+  if (satEl) {
+    satEl.textContent = (stats.rag_satisfaccion == null) ? "—" : stats.rag_satisfaccion + "%";
+  }
+  if (satDet) {
+    satDet.textContent = (fbPos + fbNeg === 0) ? "Sin feedback aún" : `👍 ${fbPos}  ·  👎 ${fbNeg}`;
+  }
+
   const topRAGDiv = document.getElementById("top-maquinas-rag");
   if (topRAGDiv) {
     if (stats.top_maquinas_rag && stats.top_maquinas_rag.length > 0) {
@@ -526,10 +538,6 @@ function inicializarPestanas() {
       if (tabName === "rag") {
         cargarEstadoRAG();
       }
-      // Si se abre el Debug RAG, cargar las máquinas indexadas
-      if (tabName === "debug") {
-        cargarMaquinasDebug();
-      }
     });
   });
 }
@@ -583,6 +591,9 @@ async function cargarListaManuales() {
           </button>
           <button class="manual-btn arbol" onclick="generarArbol('${manual.nombre}')">
             🌳 Generar árbol
+          </button>
+          <button class="manual-btn arbol-ver" onclick="verArbol('${manual.nombre}')">
+            ✏️ Ver/Editar árbol
           </button>
           <button class="manual-btn delete" onclick="confirmarEliminarManual('${manual.archivo}')">
             Eliminar
@@ -1279,141 +1290,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // -----------------------------------------
-// DEBUG RAG
-// -----------------------------------------
-
-async function cargarMaquinasDebug() {
-  const select = document.getElementById("debug-maquina");
-  if (!select) return;
-
-  try {
-    const res  = await fetch(`${API_URL}/rag/estado`);
-    const data = await res.json();
-    const manuales = (data.manuales || []).filter(m => m.indexado);
-
-    // Limpiar y repoblar
-    select.innerHTML = '<option value="">— Seleccioná una máquina —</option>';
-    manuales.forEach(m => {
-      const opt = document.createElement("option");
-      opt.value       = m.nombre;
-      opt.textContent = m.nombre;
-      select.appendChild(opt);
-    });
-
-    if (manuales.length === 0) {
-      const opt = document.createElement("option");
-      opt.value       = "";
-      opt.textContent = "(No hay manuales indexados)";
-      opt.disabled    = true;
-      select.appendChild(opt);
-    }
-  } catch (err) {
-    console.error("No se pudo cargar lista de máquinas para debug:", err);
-  }
-}
-
-async function ejecutarDebugChunks() {
-  const maquina = document.getElementById("debug-maquina").value.trim();
-  const query   = document.getElementById("debug-query").value.trim();
-  const card    = document.getElementById("debug-resultados-card");
-  const titulo  = document.getElementById("debug-resultados-titulo");
-  const body    = document.getElementById("debug-resultados-body");
-  const btn     = document.getElementById("debug-buscar-btn");
-
-  if (!maquina) { alert("Seleccioná una máquina primero."); return; }
-  if (!query)   { alert("Ingresá una consulta."); return; }
-
-  btn.disabled     = true;
-  btn.textContent  = "Buscando...";
-  card.style.display = "block";
-  titulo.textContent = "Buscando…";
-  body.innerHTML   = "<p class='loading'>Consultando el sistema RAG...</p>";
-
-  try {
-    const res = await fetch(`${API_URL}/rag/debug/chunks`, {
-      method:  "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ nombre_maquina: maquina, pregunta: query }),
-    });
-
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.detail || `HTTP ${res.status}`);
-    }
-
-    const data = await res.json();
-    titulo.textContent = `Resultados para "${query}" — ${data.total} chunk(s) recuperado(s)`;
-
-    if (!data.chunks || data.chunks.length === 0) {
-      body.innerHTML = "<p class='no-data'>⚠️ No se recuperó ningún chunk. El manual puede no estar indexado o la consulta no tiene coincidencias.</p>";
-      return;
-    }
-
-    // Tabla de resultados
-    const filas = data.chunks.map((c, i) => {
-      const scoreColor = c.score >= 0.5 ? "#388e3c" : c.score >= 0.3 ? "#f57c00" : "#d32f2f";
-      const idiomaIcon = c.idioma === "es" ? "🇦🇷" : c.idioma === "en" ? "🇺🇸" : "❓";
-      const textoEscapado = c.texto
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
-
-      return `
-        <tr style="border-bottom:1px solid #eee;">
-          <td style="padding:8px 6px;text-align:center;font-weight:bold;">${i + 1}</td>
-          <td style="padding:8px 6px;text-align:center;">${c.pagina}</td>
-          <td style="padding:8px 6px;text-align:center;font-weight:bold;color:${scoreColor};">${c.score.toFixed(3)}</td>
-          <td style="padding:8px 6px;text-align:center;">${idiomaIcon} ${c.idioma}</td>
-          <td style="padding:8px 6px;font-size:0.8rem;color:#555;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.seccion}">${c.seccion || "—"}</td>
-          <td style="padding:8px 6px;font-size:0.82rem;max-width:360px;">
-            <details>
-              <summary style="cursor:pointer;color:#1976d2;">${textoEscapado.slice(0, 80)}…</summary>
-              <pre style="white-space:pre-wrap;margin-top:6px;background:#f5f5f5;padding:8px;border-radius:4px;font-size:0.78rem;">${textoEscapado}</pre>
-            </details>
-          </td>
-        </tr>`;
-    }).join("");
-
-    body.innerHTML = `
-      <table style="width:100%;border-collapse:collapse;font-size:0.9rem;">
-        <thead>
-          <tr style="background:#f5f5f5;text-align:left;">
-            <th style="padding:8px 6px;">#</th>
-            <th style="padding:8px 6px;">Pág.</th>
-            <th style="padding:8px 6px;">Score</th>
-            <th style="padding:8px 6px;">Idioma</th>
-            <th style="padding:8px 6px;">Sección</th>
-            <th style="padding:8px 6px;">Texto (click para expandir)</th>
-          </tr>
-        </thead>
-        <tbody>${filas}</tbody>
-      </table>
-      <p style="margin-top:10px;font-size:0.8rem;color:#888;">
-        Score ≥ 0.5 🟢 relevante &nbsp;|&nbsp; 0.3–0.5 🟠 marginal &nbsp;|&nbsp; &lt;0.3 🔴 poco relevante
-      </p>`;
-
-  } catch (err) {
-    body.innerHTML = `<p class='no-data'>❌ Error: ${err.message}</p>`;
-  } finally {
-    btn.disabled    = false;
-    btn.textContent = "Buscar chunks";
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("debug-buscar-btn");
-  if (btn) btn.addEventListener("click", ejecutarDebugChunks);
-
-  // También disparar con Enter en el input
-  const input = document.getElementById("debug-query");
-  if (input) {
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") ejecutarDebugChunks();
-    });
-  }
-});
-
-// -----------------------------------------
 // INICIALIZACIÓN
 // -----------------------------------------
 
@@ -1447,6 +1323,30 @@ async function generarArbol(nombre) {
     const data = await r.json();
     if (!r.ok) throw new Error(data.detail || "Error al iniciar");
     _arbolPollProgreso(nombre);
+  } catch (e) {
+    document.getElementById("arbol-msg").textContent = "Error: " + e.message;
+  }
+}
+
+async function verArbol(nombre) {
+  const token = localStorage.getItem("chatbot_token");
+  _arbolMaquinaActual = nombre;
+  document.getElementById("arbol-titulo").textContent = "Editar árbol — " + nombre;
+  document.getElementById("arbol-progreso-wrap").style.display = "none";
+  document.getElementById("arbol-msg").textContent = "Cargando árbol…";
+  document.getElementById("arbol-json").value = "";
+  document.getElementById("arbol-modal").style.display = "flex";
+  try {
+    const r = await fetch(`${API_URL}/admin/arbol/ver/${encodeURIComponent(nombre)}`, {
+      headers: { "Authorization": `Bearer ${token}` },
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.detail || "Error al cargar el árbol");
+    document.getElementById("arbol-json").value =
+      JSON.stringify({ categorias: data.categorias || [] }, null, 2);
+    document.getElementById("arbol-msg").textContent = data.existe
+      ? `Árbol cargado (${data.n_categorias} categoría/s). Editá y guardá con "Aprobar y activar".`
+      : "Esta máquina todavía no tiene árbol cargado. Podés crearlo acá o con \"Generar árbol\".";
   } catch (e) {
     document.getElementById("arbol-msg").textContent = "Error: " + e.message;
   }

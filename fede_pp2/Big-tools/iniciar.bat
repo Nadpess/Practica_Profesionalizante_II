@@ -33,7 +33,7 @@ if errorlevel 1 (
 
 REM --- Precargar el modelo en la GPU para que la 1ra consulta sea rapida ---
 echo Precargando el modelo de IA...
-start "" /b cmd /c "ollama run qwen2.5:3b ok >nul 2>&1"
+start "" /b cmd /c "ollama run llama3.2:3b ok >nul 2>&1"
 
 REM --- Abrir el navegador cuando el server este listo ---
 start "" cmd /c "timeout /t 6 >nul & start http://127.0.0.1:8000"

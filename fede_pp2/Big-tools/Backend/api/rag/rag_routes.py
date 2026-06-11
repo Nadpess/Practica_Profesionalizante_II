@@ -145,37 +145,6 @@ def consulta_stream(
     )
 
 
-# ── Debug: ver qué chunks recupera una query ─────────────────────────────────
-
-@rag_router.post("/debug/chunks")
-def debug_chunks(
-    nombre_maquina: str = Body(...),
-    pregunta:       str = Body(...),
-):
-    """
-    Diagnóstico: muestra los chunks que se recuperarían para una query,
-    con su score, página, sección e idioma.
-    Útil para detectar si el problema es de chunking o de retrieval.
-    """
-    from api.rag.retriever import buscar_chunks
-    chunks = buscar_chunks(nombre_maquina, pregunta)
-    return {
-        "query":   pregunta,
-        "maquina": nombre_maquina,
-        "total":   len(chunks),
-        "chunks":  [
-            {
-                "pagina":  c["pagina"],
-                "score":   round(c.get("score", 0), 3),
-                "idioma":  c.get("idioma", "?"),
-                "seccion": c.get("seccion", ""),
-                "texto":   c["texto"][:300],
-            }
-            for c in chunks
-        ],
-    }
-
-
 # ── Estado general ────────────────────────────────────────────────────────────
 
 @rag_router.get("/estado")

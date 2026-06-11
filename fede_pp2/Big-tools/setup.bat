@@ -47,8 +47,8 @@ if errorlevel 1 (
 
 echo.
 echo === [3/4] Descargando modelos de IA (una sola vez, requiere internet) ===
-echo  - qwen2.5:3b ........ conversacion / diagnostico en tiempo real
-ollama pull qwen2.5:3b
+echo  - llama3.2:3b ....... conversacion / diagnostico en tiempo real
+ollama pull llama3.2:3b
 echo  - qwen2.5:7b ........ generacion automatica del arbol de decision
 ollama pull qwen2.5:7b
 echo  - nomic-embed-text .. embeddings para buscar en los manuales (RAG)

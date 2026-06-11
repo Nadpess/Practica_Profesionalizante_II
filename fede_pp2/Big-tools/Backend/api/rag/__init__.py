@@ -11,7 +11,11 @@ from typing import Optional
 # ── Modelo LLM local (Ollama) ─────────────────────────────────────────────────
 # Punto ÚNICO para cambiar de modelo en todo el sistema (chat, análisis, traducción).
 # Para probar otro: `ollama pull <modelo>` y cambiar esta línea.
-LLM_MODEL = "qwen2.5:3b"  # 3B, SIN razonamiento, entra 100% en GPU de 4 GB (rápido)
+LLM_MODEL = "llama3.2:3b"  # runtime (chat + RAG): español estable y buen acato de reglas; entra en GPU de 4 GB
+# Alternativa: "qwen2.5:3b" (más fuerte en lógica/estructura, pero más propenso a mezclar
+# español/portugués en tamaños compactos). Para volver:
+#   `ollama pull qwen2.5:3b`  y poné  LLM_MODEL = "qwen2.5:3b"
+# Compará con la métrica de satisfacción (👍/👎) del panel admin y con evaluar_rag.py.
 # Modelo para GENERAR árboles de conocimiento (tarea de admin, una sola vez).
 # Puede ser uno más grande/lento (ej. "qwen2.5:7b") porque no es runtime. Por
 # defecto usa el mismo que el runtime para no tener que descargar otro.
@@ -19,6 +23,10 @@ LLM_MODEL_GEN = "qwen2.5:7b"  # modelo más grande para generar árboles (mejor 
 # Tiempo que Ollama mantiene el modelo cargado en memoria entre consultas
 # (evita la demora de recargarlo en cada pregunta).
 LLM_KEEP_ALIVE = "30m"
+
+# Temperatura de generación: 0 = determinista/fiel, más alto = más "creativo" (riesgo de delirio).
+# 0.1 = bien pegado al manual. Punto ÚNICO para ajustarla en chat, análisis y diagnóstico.
+LLM_TEMPERATURE = 0.1
 
 # ── Detección de idioma (sin dependencias externas) ──────────────────────────
 # Palabras funcionales de alta frecuencia que distinguen español vs inglés.

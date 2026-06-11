@@ -1,0 +1,22 @@
+[
+  {
+    "maquina": "Hidrolavadora Kärcher",
+    "pregunta": "el aparato no funciona",
+    "paginas_esperadas": []
+  },
+  {
+    "maquina": "Hidrolavadora Kärcher",
+    "pregunta": "luz indicadora de combustible encendida",
+    "paginas_esperadas": []
+  },
+  {
+    "maquina": "Compresor Sullair",
+    "pregunta": "el compresor no arranca",
+    "paginas_esperadas": []
+  },
+  {
+    "maquina": "Generador Cummins",
+    "pregunta": "el motor no arranca",
+    "paginas_esperadas": []
+  }
+]

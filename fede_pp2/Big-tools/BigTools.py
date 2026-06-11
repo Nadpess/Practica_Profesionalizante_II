@@ -105,7 +105,7 @@ class App:
         # Precargar modelo de runtime
         self.set(30, "Preparando el modelo de IA…")
         try:
-            subprocess.Popen(["ollama", "run", "qwen2.5:3b", "ok"],
+            subprocess.Popen(["ollama", "run", "llama3.2:3b", "ok"],
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                              creationflags=NO_WINDOW)
         except Exception:

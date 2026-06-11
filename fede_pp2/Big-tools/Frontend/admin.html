@@ -39,7 +39,6 @@
                 <button class="tab-btn active" data-tab="estadisticas">Estadísticas</button>
                 <button class="tab-btn" data-tab="manuales">Gestión de Manuales</button>
                 <button class="tab-btn" data-tab="rag">🤖 Gestión RAG</button>
-                <button class="tab-btn" data-tab="debug">🔍 Debug RAG</button>
             </div>
 
             <!-- Sección de Estadísticas -->
@@ -126,6 +125,15 @@
                     </div>
                 </div>
 
+                <div class="stat-card">
+                    <div class="stat-icon">👍</div>
+                    <div class="stat-info">
+                        <h3>Satisfacción de respuestas (RAG)</h3>
+                        <p id="rag-satisfaccion" class="stat-number">—</p>
+                        <p id="rag-feedback-detalle" class="stat-detail" style="margin-top:2px;">Sin feedback aún</p>
+                    </div>
+                </div>
+
                 <div class="stat-card full-width">
                     <div class="stat-header">
                         <div class="stat-icon">🤖</div>
@@ -184,55 +192,6 @@
                     <div id="rag-manuales-lista" class="manuales-lista">
                         <p class="loading">Cargando estado RAG...</p>
                     </div>
-                </div>
-            </div>
-
-            <!-- ══════════════════════════════════════════════════════════ -->
-            <!-- Sección Debug RAG                                        -->
-            <!-- ══════════════════════════════════════════════════════════ -->
-            <div id="tab-debug" class="tab-content">
-                <h2>🔍 Debug RAG — Inspección de Chunks</h2>
-
-                <div class="stat-card info-card" style="margin-bottom:20px;">
-                    <div class="info-content">
-                        <p>
-                            Ingresá el nombre de una máquina indexada y una consulta para ver
-                            <strong>exactamente qué fragmentos del manual</strong> recupera el sistema RAG.
-                            Útil para diagnosticar por qué una pregunta no encuentra la respuesta esperada.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Formulario de búsqueda -->
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon">🔎</div>
-                        <h3>Buscar chunks</h3>
-                    </div>
-                    <div class="form-group" style="margin-top:12px;">
-                        <label for="debug-maquina">Máquina:</label>
-                        <select id="debug-maquina" style="width:100%;padding:8px;margin-top:4px;border:1px solid #ddd;border-radius:4px;font-size:0.95rem;">
-                            <option value="">— Seleccioná una máquina —</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-top:12px;">
-                        <label for="debug-query">Consulta:</label>
-                        <input type="text" id="debug-query"
-                               placeholder="Ej: el compresor no arranca"
-                               style="width:100%;padding:8px;margin-top:4px;box-sizing:border-box;border:1px solid #ddd;border-radius:4px;font-size:0.95rem;">
-                    </div>
-                    <button id="debug-buscar-btn" class="upload-btn" style="margin-top:14px;">
-                        Buscar chunks
-                    </button>
-                </div>
-
-                <!-- Resultados -->
-                <div class="stat-card full-width" id="debug-resultados-card" style="display:none;">
-                    <div class="stat-header">
-                        <div class="stat-icon">📋</div>
-                        <h3 id="debug-resultados-titulo">Resultados</h3>
-                    </div>
-                    <div id="debug-resultados-body" style="overflow-x:auto;margin-top:10px;"></div>
                 </div>
             </div>
 
@@ -331,7 +290,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Configuración de la API (debe cargarse antes de admin.js) -->
     <script src="/static/js/config.js"></script>
-    <script src="/static/js/admin.js?v=20260606"></script>
+    <script src="/static/js/admin.js?v=20260610"></script>
 </body>
 
 </html>

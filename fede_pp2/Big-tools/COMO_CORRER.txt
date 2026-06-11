@@ -31,7 +31,7 @@ Abrir terminal en la carpeta del proyecto y correr:
 Ollama tiene que estar activo antes de levantar el servidor.
 Bajar los modelos una sola vez:
 
-    ollama pull qwen2.5:3b         (conversacion / diagnostico en tiempo real)
+    ollama pull llama3.2:3b        (conversacion / diagnostico en tiempo real)
     ollama pull qwen2.5:7b         (generacion automatica del arbol)
     ollama pull nomic-embed-text   (embeddings para la busqueda en los manuales)
 

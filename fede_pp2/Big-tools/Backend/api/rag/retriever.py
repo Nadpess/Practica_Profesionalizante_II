@@ -5,11 +5,15 @@ import ollama
 import json
 from pathlib import Path
 
-from . import normalizar_nombre_coleccion, get_cliente_chroma, detectar_idioma, LLM_MODEL, LLM_KEEP_ALIVE
+from . import normalizar_nombre_coleccion, get_cliente_chroma, detectar_idioma, LLM_MODEL, LLM_KEEP_ALIVE, LLM_TEMPERATURE
 from .cache import buscar_en_cache, guardar_en_cache
 
 N_RESULTADOS       = 6
 N_RESULTADOS_FINAL = 4   # fragmentos que se le pasan al LLM (menos = más rápido / menos contexto)
+
+# Filtro de relevancia por distancia coseno (0 = idéntico, mayor = menos parecido).
+MARGEN_RELEVANCIA  = 0.30   # se descartan fragmentos peores que (mejor + margen): saca ruido lejano
+DIST_SIN_CONTEXTO  = 1.00   # si ni el mejor fragmento baja de esto, no hay contexto útil → no inventar
 
 # Prefijo opcional para desactivar el "razonamiento" de modelos que lo tienen
 # (ej. qwen3 → "/no_think\n"). Con modelos sin razonamiento (gemma3) va vacío.
@@ -161,7 +165,16 @@ def buscar_chunks(nombre_maquina: str, pregunta: str) -> list[dict]:
             pass
 
     chunks_ordenados = sorted(vistos.values(), key=lambda c: c["score"])
-    return _preferir_espanol(chunks_ordenados[:N_RESULTADOS_FINAL * 2])[:N_RESULTADOS_FINAL]
+    if not chunks_ordenados:
+        return []
+    # Filtro de relevancia: si ni el mejor fragmento es razonablemente cercano,
+    # no hay contexto útil → devolvemos vacío para no responder con ruido.
+    mejor = chunks_ordenados[0]["score"]
+    if mejor > DIST_SIN_CONTEXTO:
+        return []
+    # Descartamos los fragmentos claramente más lejanos que el mejor (menos ruido = más precisión).
+    relevantes = [c for c in chunks_ordenados if c["score"] <= mejor + MARGEN_RELEVANCIA]
+    return _preferir_espanol(relevantes[:N_RESULTADOS_FINAL * 2])[:N_RESULTADOS_FINAL]
 
 
 def calcular_confianza(chunks: list[dict]) -> int:
@@ -217,7 +230,7 @@ def _construir_prompt(
         return (
             f"Sos el asistente técnico del Sistema Big Tools.\n"
             f"Analizá la falla usando ÚNICAMENTE los fragmentos del manual proporcionados.\n"
-            f"Tu respuesta debe estar 100% en español. Si el manual está en inglés, TRADUCÍ cada parte.\n"
+            f"Tu respuesta debe estar 100% en español rioplatense. NUNCA respondas en portugués ni en inglés. Si el manual está en inglés, TRADUCÍ cada parte al español.\n"
             f"El que consulta ES el técnico en campo. NUNCA lo remitás a 'un técnico', 'servicio técnico', 'personal calificado/autorizado', 'soporte' ni similares: la solución la ejecuta él con el manual.\n"
             f"NUNCA inventes datos que no estén en los fragmentos.\n"
             f"Si la info no está en el manual: escribí exactamente 'Esta información no se encuentra en el manual indexado. Consultá al administrador para actualizar la base de datos.'\n\n"
@@ -241,7 +254,7 @@ def _construir_prompt(
             f"El técnico YA pasó por el diagnóstico guiado y la ampliación; ahora te hace repreguntas sobre ese mismo equipo.\n\n"
             f"DÓNDE ESTAMOS PARADOS (contexto del diagnóstico previo):\n{contexto_diag}\n\n"
             f"REGLAS:\n"
-            f"- Respondé la consulta de forma DIRECTA, clara y conversacional, 100% en español. SIN formato rígido (nada de 'Causa:/Procedimiento:').\n"
+            f"- Respondé la consulta de forma DIRECTA, clara y conversacional, 100% en español rioplatense (NUNCA en portugués ni inglés). SIN formato rígido (nada de 'Causa:/Procedimiento:').\n"
             f"- Apoyate en el contexto de arriba y en los fragmentos del manual. Si el manual está en inglés, traducí.\n"
             f"- El que consulta ES el técnico en campo — nunca lo remitás a 'un técnico' ni al 'servicio técnico'.\n"
             f"- NUNCA inventes datos que no estén en el contexto ni en los fragmentos.\n"
@@ -256,7 +269,7 @@ def _construir_prompt(
         f"Sos el asistente técnico del Sistema Big Tools.\n"
         f"Analizá la consulta y respondé usando ÚNICAMENTE los fragmentos del manual proporcionados.\n\n"
         f"REGLAS:\n"
-        f"- Tu respuesta debe estar 100% en español. Cero palabras en inglés.\n"
+        f"- Tu respuesta debe estar 100% en español rioplatense. Cero palabras en inglés y NUNCA en portugués.\n"
         f"- Si el manual está en inglés, TRADUCÍ cada paso antes de escribirlo.\n"
         f"  Ejemplo: 'Press and hold the START button' → 'Mantené presionado el botón de arranque'\n"
         f"- Sin saludos. Directo al diagnóstico.\n"
@@ -303,6 +316,7 @@ def generar_respuesta(nombre_maquina: str, pregunta: str, modo_analisis: bool = 
             model=LLM_MODEL,
             messages=[{"role": "user", "content": _NO_THINK + prompt}],
             keep_alive=LLM_KEEP_ALIVE,
+            options={"temperature": LLM_TEMPERATURE},
         )
         return {"respuesta": respuesta["message"]["content"], "paginas": paginas}
     except Exception as e:
@@ -348,7 +362,7 @@ def generar_respuesta_stream(nombre_maquina: str, pregunta: str, modo_analisis: 
             prompt=_NO_THINK + prompt,
             stream=True,
             keep_alive=LLM_KEEP_ALIVE,
-            options={"num_predict": 800, "temperature": 0.1, "num_ctx": 4096}
+            options={"num_predict": 800, "temperature": LLM_TEMPERATURE, "num_ctx": 4096}
         ):
             token = chunk.get("response", "")
             if token:
@@ -442,7 +456,7 @@ def generar_respuesta_stream_conversacional(
             prompt=_NO_THINK + prompt,
             stream=True,
             keep_alive=LLM_KEEP_ALIVE,
-            options={"num_predict": 800, "temperature": 0.1, "num_ctx": 4096}
+            options={"num_predict": 800, "temperature": LLM_TEMPERATURE, "num_ctx": 4096}
         ):
             token = chunk.get("response", "")
             if token:

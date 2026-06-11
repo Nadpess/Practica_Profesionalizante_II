@@ -28,6 +28,8 @@ class StatsManager:
             # ── RAG ──────────────────────────────
             "total_consultas_rag": 0,
             "consultas_rag_por_maquina": {},
+            "rag_feedback_pos": 0,
+            "rag_feedback_neg": 0,
         }
 
         if not STATS_FILE.exists():
@@ -92,6 +94,12 @@ class StatsManager:
 
         self._guardar_stats()
 
+    def registrar_feedback_rag(self, positivo: bool):
+        """Registra el feedback 👍/👎 de una respuesta RAG (métrica de satisfacción)."""
+        clave = "rag_feedback_pos" if positivo else "rag_feedback_neg"
+        self.stats[clave] = self.stats.get(clave, 0) + 1
+        self._guardar_stats()
+
     def registrar_diagnostico_completado(self, maquina: str, categoria: str, falla: str):
         """
         Marca un diagnóstico como completado.
@@ -136,6 +144,11 @@ class StatsManager:
             reverse=True,
         )[:3]
 
+        fb_pos = self.stats.get("rag_feedback_pos", 0)
+        fb_neg = self.stats.get("rag_feedback_neg", 0)
+        fb_total = fb_pos + fb_neg
+        rag_satisfaccion = round(100 * fb_pos / fb_total) if fb_total else None
+
         return {
             "total_diagnosticos":   self.stats["total_diagnosticos"],
             "top_maquinas":         [{"maquina": m, "cantidad": c} for m, c in maquinas_ordenadas],
@@ -147,6 +160,9 @@ class StatsManager:
             # ── RAG ──────────────────────────────────────────────────────────
             "total_consultas_rag":  self.stats.get("total_consultas_rag", 0),
             "top_maquinas_rag":     [{"maquina": m, "cantidad": c} for m, c in rag_maquinas_ordenadas],
+            "rag_feedback_pos":     fb_pos,
+            "rag_feedback_neg":     fb_neg,
+            "rag_satisfaccion":     rag_satisfaccion,
         }
 
 # Instancia global para uso en las rutas

@@ -653,6 +653,11 @@ def registrar_feedback_usuario(
         paginas=paginas,
         secciones=secciones,
     )
+    try:
+        from api.stats import stats_manager
+        stats_manager.registrar_feedback_rag(positivo)
+    except Exception:
+        pass
     return {"success": ok, "tipo": "positivo" if positivo else "negativo"}
 
 
@@ -738,4 +743,28 @@ def admin_aprobar_arbol(
         "clave": clave,
         "n_categorias": len(categorias),
         "mensaje": f"Árbol aprobado y activo para '{nombre_maquina}'.",
+    }
+
+
+@router.get("/admin/arbol/ver/{nombre_maquina}")
+def admin_ver_arbol(
+    nombre_maquina: str,
+    authorization: Optional[str] = Header(None, alias="Authorization"),
+):
+    """Devuelve el árbol cargado de una máquina para verlo/editarlo en el admin.
+    Para guardar los cambios se usa POST /admin/arbol/aprobar/{nombre_maquina}."""
+    _check_admin(authorization)
+    clave = normalizar_nombre_para_clave(nombre_maquina)
+    try:
+        with open(BASE_CONOCIMIENTO_JSON, "r", encoding="utf-8") as f:
+            base_c = json.load(f)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al leer la base: {e}")
+    sub = base_c.get(clave, {"categorias": []})
+    categorias = sub.get("categorias", []) if isinstance(sub, dict) else []
+    return {
+        "clave": clave,
+        "existe": clave in base_c,
+        "n_categorias": len(categorias),
+        "categorias": categorias,
     }

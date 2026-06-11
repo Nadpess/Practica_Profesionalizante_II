@@ -24,7 +24,7 @@ VENV_PY  = os.path.join(BASE, "venv", "Scripts", "python.exe")
 MANUALES = os.path.join(BASE, "Backend", "data", "manuales_pdf")
 FLAG     = os.path.join(BASE, "Backend", "data", ".setup_ok")
 FLAG_VER = "v4.0"
-MODELOS  = [("qwen2.5:3b", "conversación / diagnóstico"),
+MODELOS  = [("llama3.2:3b", "conversación / diagnóstico"),
             ("qwen2.5:7b", "generación del árbol"),
             ("nomic-embed-text", "embeddings (RAG)")]
 PY_URL   = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe"
